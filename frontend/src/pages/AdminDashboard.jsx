@@ -31,7 +31,7 @@ export default function AdminDashboard() {
       <section className="panel"><div className="page-heading"><h2>Submissions by site</h2><p className="muted">{result.items.length} {result.items.length===1?'submission matches':'submissions match'}</p></div>
         {result.countsBySite.length===0?<p>No site totals for the current filters.</p>:<ul className="site-counts">{result.countsBySite.map(site=><li data-testid="site-count" key={site.siteId}><span>{site.siteName}</span><strong>{site.count}</strong></li>)}</ul>}
       </section>
-      {result.items.length===0?<section className="panel empty"><h2>No submissions match these filters.</h2><p>Adjust the date range, worker, or job site.</p></section>:<section className="panel table-panel"><h2>Submission records</h2><div className="table-scroll"><table><thead><tr><th>Worker</th><th>Site</th><th>Date</th><th>Status</th><th><span className="visually-hidden">Details</span></th></tr></thead>
+      {result.items.length===0?<section className="panel empty"><h2>No submissions match these filters.</h2><p>Adjust the date range, worker, or job site.</p></section>:<section className="panel table-panel"><h2>Submission records</h2><div className="table-scroll"><table><thead><tr><th>Worker</th><th>Site</th><th>Date</th><th>Status</th><th aria-label="Details"></th></tr></thead>
         <tbody>{result.items.map(item=><tr key={item.id}><td>{item.worker.name}</td><td>{item.site.name}</td><td><time dateTime={item.workDate}>{item.workDate}</time></td><td><span className="status">{item.status}</span></td><td><Link aria-label={`View submission ${item.id}`} to={`/submissions/${item.id}`}>View</Link></td></tr>)}</tbody></table></div>
       </section>}
     </>}
