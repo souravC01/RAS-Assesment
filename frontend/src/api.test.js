@@ -2,6 +2,22 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { api } from './api.js';
 
+test('interrupted successful write response offers history without repeating the write', async t => {
+  let writes=0;
+  t.mock.method(globalThis,'fetch',async path=>{
+    if(path.endsWith('/csrf')) return Response.json({headerName:'X-CSRF-TOKEN',token:'token'});
+    writes++;
+    return new Response('{"id":',{status:201,headers:{'content-type':'application/json'}});
+  });
+  await assert.rejects(api('/submissions',{method:'POST',body:new FormData()}),e=>e.status===0&&e.message.includes('history'));
+  assert.equal(writes,1);
+});
+
+test('malformed error bodies preserve authentication status', async t => {
+  t.mock.method(globalThis,'fetch',async()=>new Response('{',{status:401,headers:{'content-type':'application/json'}}));
+  await assert.rejects(api('/sites'),e=>e.status===401&&e.message==='Please sign in to continue.');
+});
+
 test('expired session fails without retrying a write', async t => {
   let writes = 0;
   t.mock.method(globalThis, 'fetch', async (path, options) => {

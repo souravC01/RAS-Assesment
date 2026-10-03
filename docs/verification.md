@@ -75,6 +75,9 @@
 - Browser network failure preserved draft/files, offered history verification, and issued exactly one write. Different-account re-login cleared the former user's draft.
 - ERD rendered with one-off Mermaid CLI 12.0.0 and visually inspected against both migrations. No diagram runtime was added to the app.
 - Live account passwords are in a Git-ignored private handoff; no provider credentials or demo passwords are in committed delivery documents.
-- Render idle wake verification and fresh whole-branch review are in progress; final results will be appended.
+- Fresh whole-branch review found zero Critical, three Important and zero Minor findings. All three Important findings were reproduced before correction: history navigation discarded a draft, truncated JSON bypassed uncertainty handling, and failed site loading had no recovery.
+- One fix pass passed the complete suite on October 3: backend 6 executed/1 opt-in skipped, explicit real storage 1/1, frontend 8/8 and build, and three Chrome recovery scenarios. History now opens separately with the original draft intact; malformed response bodies preserve known errors or explain uncertain writes; sites can be retried and reloaded after same-account sign-in.
+- The test wrapper installs dependencies before starting its owned preview server; this resolved the Windows native-module lock encountered before the pause. Dependency audit reported zero vulnerabilities and the tracked-file secret scan passed.
+- Render idle wake verification is running again after the requested pause; final observed results will be appended.
 
-Complete app behavior remains to be verified.
+Final deployment recovery checks and idle/wake verification remain pending.
