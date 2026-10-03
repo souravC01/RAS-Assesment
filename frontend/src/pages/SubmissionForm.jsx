@@ -50,7 +50,7 @@ export default function SubmissionForm({user,onCreated,onSignedIn}) {
             {answers.map(([value,text])=><label key={value} className={checks[key]===value?'selected':''}><input type="radio" name={key} value={value} required checked={checks[key]===value} onChange={()=>setChecks({...checks,[key]:value})} />{text}</label>)}
           </div></fieldset>)}</div>
         </section>
-        <section className="panel"><h2>Notes and photos</h2><label>Notes<textarea rows="4" maxLength={4000} required={issue} value={notes} onChange={e=>setNotes(e.target.value)} /></label>
+        <section className="panel"><h2>Notes and photos</h2><label htmlFor="notes">Notes</label><textarea id="notes" rows="4" maxLength={4000} required={issue} value={notes} onChange={e=>setNotes(e.target.value)} />
           <small>{issue?'Explain the reported issue.':'Optional when no issues are reported.'} {notes.length}/4,000 characters</small>
           <label className="photo-input">Supporting photos<input type="file" accept="image/jpeg,image/png" multiple onChange={addPhotos} /></label>
           <small>Add 1–5 JPEG or PNG photos, up to 5 MB each. Convert HEIC photos before uploading.</small>
