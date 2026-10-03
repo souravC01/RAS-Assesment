@@ -49,5 +49,12 @@
 
 - SubmissionReadTest first failed at the missing history route. PostgreSQL then exposed an untyped null date-filter parameter; using the non-null date column as the omitted bound fixed it.
 - GREEN: all 5 related backend tests passed. Ownership history, concealed cross-user detail/photo IDs, admin access, five-minute photo expiry, no-store headers, individual/combined inclusive filters, unknown IDs, reversed dates, and empty counts were checked.
+- Hosted checks passed: admin read followed by another framer guessing the same detail/photo returned 404; admin route returned 403; inclusive filtered rows/counts matched; a signed private photo returned the exact stored bytes and unsigned access was denied.
+
+## Worker UI
+
+- Browser RED: the foundation lacked the worker history screen.
+- Unit RED: Vancouver date conversion missing and failed session diagnosis masked a 403. GREEN: all 6 request/date tests passed and the production build succeeded.
+- Hosted worker acceptance is pending deployment of these screens.
 
 Complete app behavior remains to be verified.

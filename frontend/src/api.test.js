@@ -38,3 +38,12 @@ test('proxy HTML errors become readable service errors', async t => {
   t.mock.method(globalThis, 'fetch', async () => new Response('<h1>Bad gateway</h1>', { status: 502 }));
   await assert.rejects(api('/auth/me'), e => e.status === 502 && e.message.includes('service'));
 });
+
+test('failed session diagnosis preserves the original forbidden response', async t => {
+  t.mock.method(globalThis,'fetch',async path=>{
+    if(path.endsWith('/csrf')) return Response.json({headerName:'X-CSRF-TOKEN',token:'token'});
+    if(path.endsWith('/auth/me')) throw new TypeError('fetch failed');
+    return Response.json({message:'Request forbidden.'},{status:403});
+  });
+  await assert.rejects(api('/submissions',{method:'POST',body:new FormData()}),e=>e.status===403&&e.message==='Request forbidden.');
+});
