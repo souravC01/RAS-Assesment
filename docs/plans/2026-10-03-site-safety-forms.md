@@ -5,7 +5,7 @@
 
 **Architecture:** One repository contains a React frontend on a Render Static Site and one Spring Boot API on a Render Web Service. Verify Render's external `/api/*` rewrite behavior during the deployment gate; Spring owns sessions, authorization, validation, and all persistence. Neon PostgreSQL stores four domain entities, and private Neon Object Storage holds photos.
 
-**Repository:** https://github.com/souravC01/RAS-Assesment.git is the user-designated remote for all commits and pull requests. It was verified empty, private, and accessible with push permission. Use feature branches and PRs targeting `main`; attach any created PR to this chat. The local remote has not yet been configured.
+**Repository:** https://github.com/souravC01/RAS-Assesment.git is the user-designated remote for all commits and pull requests. It was verified empty, private, and accessible with push permission. Use feature branches and PRs targeting `main`; attach any created PR to this chat. The designated remote is configured and draft PR #1 tracks application changes.
 
 **Tech Stack:** React, JavaScript, Vite, React Router, CSS, Java 21, Spring Boot 4.1.1, Maven Wrapper, Spring Security, Spring Data JPA, Bean Validation, Flyway, PostgreSQL, AWS SDK for Java v2 S3 client/presigner. Tests use Spring Boot's test starter, Spring Security test support, PostgreSQL Testcontainers, and Node's built-in test runner for the small frontend request helper.
 
@@ -43,7 +43,7 @@ For implementation, 5 MB means 5,000,000 bytes; configure multipart request capa
 
 ## Repository and file boundaries
 
-There is currently no application or Git repository, only the PDF and planning documents. No code conventions or `AGENTS.md` were found. Initialize Git during execution, preserve existing documents, and never commit secrets. One plan is appropriate because authentication, forms, photos, and admin views share one small domain and must ship together.
+The initial workspace contained the PDF and planning documents. No code conventions or `AGENTS.md` were found. Git and the foundation have now been initialized during execution; preserve existing documents and never commit secrets. One plan is appropriate because authentication, forms, photos, and admin views share one small domain and must ship together.
 
 Paths below are repository-relative. `B` expands to `backend/src/main/java/ca/ras/safety`, `T` to `backend/src/test/java/ca/ras/safety`, and `R` to `backend/src/main/resources`. Each file listed under a task is a concrete path after this expansion.
 
@@ -106,8 +106,8 @@ Environment contract: `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SP
 
 **Interfaces:** Produces the health and auth HTTP contracts, `UserRepository.findByEmail(String): Optional<User>`, and `AuthController.me(Authentication): Actor` (`Actor` is a nested record in `AuthController`). Put the small public health handler in `AuthController` as well. Produces `api(path, options = {}): Promise<object|null>`, `login(email,password): Promise<Actor>`, `logout(): Promise<void>` in `api.js`. `api` prefixes `/api`, includes same-origin credentials, throws an error with numeric `status`, and never retries writes.
 
-- [ ] Generate the minimal Boot/Maven and Vite/React projects; initialize Git. Add only the dependencies named above and those needed by the task. Add local PostgreSQL to `compose.yaml`, a Maven-wrapper multi-stage Java 21 Dockerfile, and environment examples with placeholders. Test-only storage dependencies may wait for Task 2.
-- [ ] Write `AuthTest.loginRequiresCsrfAndPersistsSession`: seed a test user with BCrypt, obtain a real token from `/api/auth/csrf`, then test actual form login and `/me`, rather than only `@WithMockUser`.
+- [x] Generate the minimal Boot/Maven and Vite/React projects; initialize Git. Add only the dependencies named above and those needed by the task. Add local PostgreSQL to `compose.yaml`, a Maven-wrapper multi-stage Java 21 Dockerfile, and environment examples with placeholders. Test-only storage dependencies may wait for Task 2.
+- [x] Write `AuthTest.loginRequiresCsrfAndPersistsSession`: seed a test user with BCrypt, obtain a real token from `/api/auth/csrf`, then test actual form login and `/me`, rather than only `@WithMockUser`.
 
 ```java
 mockMvc.perform(post("/api/auth/login").param("email", email).param("password", password))
@@ -119,13 +119,13 @@ mockMvc.perform(get("/api/auth/me").session(loggedInSession))
 ```
 
 Also assert wrong credentials -> 401; logout -> session invalidated; a fresh anonymous `/me` -> 401; a restarted session requires login again. Setup variables above come from the test's seeded user and actual MockMvc login response.
-- [ ] Run `.\mvnw.cmd -Dtest=AuthTest test`; expect failures for missing auth behavior before implementing it.
-- [ ] Implement the users migration and login with Spring's form-login/session support, BCrypt, JSON success/failure handlers, and active CSRF protection. Session cookie: host-only, HttpOnly, Path `/`, SameSite=Lax, Secure in deployment (local HTTP profile only disables Secure). Use `/auth/csrf` to obtain the token before login and refresh it after login/logout. Do not disable CSRF to make the SPA work. See [Spring's token endpoint guidance](https://docs.spring.io/spring-security/reference/servlet/exploits/csrf.html).
-- [ ] Implement the React login shell and logout. Use ordinary component state, no global state library. Show pending/error states; interpret `/me` 401 as signed out. Add explicit no-store headers across security and controller responses.
-- [ ] Deploy the API as a Render Web Service, connect Neon through a TLS JDBC URL, and deploy the frontend as a Render Static Site. Keep database/S3/demo passwords only in provider secrets. Seed one admin and two framers only when `DEMO_SEED_ENABLED=true`; take passwords from required environment variables and never reset existing accounts on restart.
-- [ ] Configure Vite's local `/api` proxy and test a Render `/api/*` external rewrite before the SPA fallback. Preserve `/api` on the API destination. Verify POST/multipart forwarding and session cookies rather than assuming static rewrites behave as a full API proxy. Never enable CDN caching for API paths. [Render redirect/rewrite documentation](https://render.com/docs/redirects-rewrites) allows full destination URLs; it is not proof of our authentication or upload behavior. If that route cannot satisfy the accepted requirements, record the failure and prefer serving the built React assets from Spring Boot on the same Render Web Service, subject to updating this topology decision.
-- [ ] Run `.\mvnw.cmd -Dtest=AuthTest test` and `npm run build`; expect PASS/build success. In the deployed browser, login, reload, logout, and try a different account; verify no cached user data, correct secure cookie flags, and actual CSRF rejection. Record URLs and results without secrets.
-- [ ] Commit owned files: `git commit -m "feat: deploy secure session login"`.
+- [x] Run `.\mvnw.cmd -Dtest=AuthTest test`; expect failures for missing auth behavior before implementing it.
+- [x] Implement the users migration and login with Spring's form-login/session support, BCrypt, JSON success/failure handlers, and active CSRF protection. Session cookie: host-only, HttpOnly, Path `/`, SameSite=Lax, Secure in deployment (local HTTP profile only disables Secure). Use `/auth/csrf` to obtain the token before login and refresh it after login/logout. Do not disable CSRF to make the SPA work. See [Spring's token endpoint guidance](https://docs.spring.io/spring-security/reference/servlet/exploits/csrf.html).
+- [x] Implement the React login shell and logout. Use ordinary component state, no global state library. Show pending/error states; interpret `/me` 401 as signed out. Add explicit no-store headers across security and controller responses.
+- [x] Deploy the API as a Render Web Service, connect Neon through a TLS JDBC URL, and deploy the frontend as a Render Static Site. Keep database/S3/demo passwords only in provider secrets. Seed one admin and two framers only when `DEMO_SEED_ENABLED=true`; take passwords from required environment variables and never reset existing accounts on restart.
+- [x] Configure Vite's local `/api` proxy and test a Render `/api/*` external rewrite before the SPA fallback. Preserve `/api` on the API destination. Verify POST/multipart forwarding and session cookies rather than assuming static rewrites behave as a full API proxy. Never enable CDN caching for API paths. [Render redirect/rewrite documentation](https://render.com/docs/redirects-rewrites) allows full destination URLs; it is not proof of our authentication or upload behavior. If that route cannot satisfy the accepted requirements, record the failure and prefer serving the built React assets from Spring Boot on the same Render Web Service, subject to updating this topology decision.
+- [x] Run `.\mvnw.cmd -Dtest=AuthTest test` and `npm run build`; expect PASS/build success. In the deployed browser, login, reload, logout, and try a different account; verify no cached user data, correct secure cookie flags, and actual CSRF rejection. Record URLs and results without secrets.
+- [x] Commit owned files: `git commit -m "feat: deploy secure session login"`.
 
 ### Task 2: Prove private photo storage and maximum-size transport
 
@@ -133,7 +133,7 @@ Also assert wrong credentials -> 401; logout -> session invalidated; a fresh ano
 
 **Interfaces:** `PhotoStorage.put(String key, byte[] bytes, String contentType): void`; `delete(String key): void`; `presign(String key, Duration ttl): URI`. Uses server-only Neon S3 endpoint, region, access key, secret, and bucket settings. Concrete class, no custom storage abstraction. The temporary admin-only `POST /api/admin/storage-probe` accepts repeated `photos`, returns a private 5-minute URL, and removes probe objects after the manual check.
 
-- [ ] Write opt-in `PhotoStorageTest.privateObjectRoundTrip` (enabled only by `STORAGE_SMOKE=true`), uploading a generated valid JPEG under a random `probe/` key. Assert unsigned access denied, signed GET 200 with identical bytes, and delete in `finally`. Do not log the signed URL or credentials.
+- [x] Write opt-in `PhotoStorageTest.privateObjectRoundTrip` (enabled only by `STORAGE_SMOKE=true`), uploading a generated valid JPEG under a random `probe/` key. Assert unsigned access denied, signed GET 200 with identical bytes, and delete in `finally`. Do not log the signed URL or credentials.
 
 ```java
 assertThat(unsignedResponse.statusCode()).isIn(401, 403, 404);
@@ -141,11 +141,11 @@ assertThat(signedResponse.statusCode()).isEqualTo(200);
 assertThat(signedResponse.body()).isEqualTo(uploadedBytes);
 ```
 
-- [ ] With a dedicated test bucket and environment configured, run `.\mvnw.cmd -Dtest=PhotoStorageTest test`; confirm failure without implemented storage operations. A skipped smoke test is not passing evidence.
-- [ ] Implement the methods with AWS SDK v2, path-style addressing, bounded timeouts, and private bucket access. Never store photos on Render disk. Match the current Neon endpoint/credential settings from its console; [S3 compatibility](https://neon.com/docs/storage/s3-compatibility) is the provider contract.
-- [ ] Deploy the protected probe on the same Render frontend/API route. Send five valid 5,000,000-byte images with a real CSRF token and session, plus small malformed/oversized requests. Confirm full-size delivery, private reads, and cleanup. Limit the probe to the named profile and never expose anonymous uploads.
-- [ ] Record the command, timestamp, bytes transferred, and outcome in `docs/verification.md`; rerun the storage smoke and expect PASS. If the route rejects the agreed payload or loses cookies, stop dependent UI work and amend this plan's transport design with evidence. Do not silently reduce the accepted limits or switch providers.
-- [ ] Commit: `git commit -m "feat: verify private photo storage transport"`.
+- [x] With a dedicated test bucket and environment configured, run `.\mvnw.cmd -Dtest=PhotoStorageTest test`; confirm failure without implemented storage operations. A skipped smoke test is not passing evidence.
+- [x] Implement the methods with AWS SDK v2, path-style addressing, bounded timeouts, and private bucket access. Never store photos on Render disk. Match the current Neon endpoint/credential settings from its console; [S3 compatibility](https://neon.com/docs/storage/s3-compatibility) is the provider contract.
+- [x] Deploy the protected probe on the same Render frontend/API route. Send five valid 5,000,000-byte images with a real CSRF token and session, plus small malformed/oversized requests. Confirm full-size delivery, private reads, and cleanup. Limit the probe to the named profile and never expose anonymous uploads.
+- [x] Record the command, timestamp, bytes transferred, and outcome in `docs/verification.md`; rerun the storage smoke and expect PASS. If the route rejects the agreed payload or loses cookies, stop dependent UI work and amend this plan's transport design with evidence. Do not silently reduce the accepted limits or switch providers.
+- [x] Commit: `git commit -m "feat: verify private photo storage transport"`.
 
 ### Task 3: Create validated, atomic database submissions
 
@@ -245,4 +245,4 @@ The test supplies FormData, a CSRF-token response, and a 401 response for the wr
 
 Aim for Tasks 1-2 in the first 3-4 hour session, Tasks 3-4 in the second, Tasks 5-6 in the third, and Task 7 in the final 2-4 hours. These are estimates; the first deployment gate determines whether the October 6-7 target remains realistic. Drop optional review/polish before any required feature or security check.
 
-Plan only: no implementation steps have been executed. Recommended execution method is **Native** because the tasks share a small set of tightly coupled contracts and the user wants a focused, time-bounded assessment. Follow the writing-plans handoff and obtain the user's execution-method choice before starting application changes.
+Execution in progress: Tasks 1–2 are verified; later task checkboxes track the remaining work. Recommended execution method is **Native** because the tasks share a small set of tightly coupled contracts and the user wants a focused, time-bounded assessment. Follow the writing-plans handoff and obtain the user's execution-method choice before starting application changes.
