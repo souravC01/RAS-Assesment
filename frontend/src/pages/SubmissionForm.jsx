@@ -9,12 +9,15 @@ function Preview({file}) {
   return <img src={url} alt={`Preview of ${file.name}`} />;
 }
 export default function SubmissionForm({user,onCreated,onSignedIn}) {
-  const [sites,setSites]=useState([]),[siteError,setSiteError]=useState('');
+  const [sites,setSites]=useState([]),[siteError,setSiteError]=useState(''),[siteAttempt,setSiteAttempt]=useState(0),[sitesLoading,setSitesLoading]=useState(false);
   const [siteId,setSiteId]=useState(''),[workDate,setWorkDate]=useState(today),[checks,setChecks]=useState({});
   const [notes,setNotes]=useState(''),[photos,setPhotos]=useState([]);
   const [error,setError]=useState(''),[fields,setFields]=useState({}),[pending,setPending]=useState(false),[expired,setExpired]=useState(false),[uncertain,setUncertain]=useState(false);
-  useEffect(()=>{const controller=new AbortController();api('/sites',{signal:controller.signal}).then(setSites)
-    .catch(e=>{if(e.name!=='AbortError') setSiteError(e.message);});return()=>controller.abort();},[]);
+  useEffect(()=>{const controller=new AbortController();setSiteError('');setSitesLoading(true);
+    api('/sites',{signal:controller.signal}).then(result=>{if(!controller.signal.aborted)setSites(result);})
+      .catch(e=>{if(!controller.signal.aborted){setSiteError(e.message);if(e.status===401)setExpired(true);}})
+      .finally(()=>{if(!controller.signal.aborted)setSitesLoading(false);});
+    return()=>controller.abort();},[siteAttempt]);
   const issue=Object.values(checks).includes('ISSUE');
   function addPhotos(event) {
     const added=Array.from(event.target.files);event.target.value='';
@@ -36,7 +39,8 @@ export default function SubmissionForm({user,onCreated,onSignedIn}) {
   return <section className="form-page"><Link className="back-link" to="/submissions">← My submissions</Link>
     <p className="eyebrow">Before work begins</p><h1>Daily safety form</h1>
     <p>Report each check honestly. An issue can be submitted with explanatory notes.</p>
-    {siteError&&<p className="error" role="alert">{siteError}</p>}
+    {sitesLoading&&<p role="status">Loading job sites…</p>}
+    {siteError&&<div className="error" role="alert"><p>{siteError}</p>{!expired&&<button type="button" disabled={sitesLoading} onClick={()=>setSiteAttempt(a=>a+1)}>Retry loading sites</button>}</div>}
     <form onSubmit={submit}>
       <fieldset disabled={pending||expired} className="form-fields">
         <section className="panel"><h2>Site and date</h2><div className="form-fields">
@@ -58,11 +62,11 @@ export default function SubmissionForm({user,onCreated,onSignedIn}) {
         </section>
       </fieldset>
       {error&&<div className="error" role="alert"><p>{error}</p>{Object.entries(fields).map(([key,text])=><p key={key}>{text}</p>)}
-        {uncertain&&<Link to="/submissions">Check your history before retrying</Link>}</div>}
+        {uncertain&&<><Link to="/submissions" target="_blank" rel="noopener noreferrer">Check your history before retrying</Link><p>History opens in a new tab. Your draft stays here.</p></>}</div>}
       <p className="muted">After submission, this record cannot be edited.</p>
-      <button disabled={pending||expired||sites.length===0}>{pending?'Submitting photos…':'Submit form'}</button>
+      <button disabled={pending||expired||sitesLoading||sites.length===0}>{pending?'Submitting photos…':'Submit form'}</button>
       {pending&&<p role="status">Please keep this page open while your photos upload.</p>}
     </form>
-    {expired&&<Login inline onSignedIn={actor=>{onSignedIn(actor);if(actor.id===user.id) {setExpired(false);setError('Signed in again. Review your form and submit when ready.');}}} />}
+    {expired&&<Login inline onSignedIn={actor=>{onSignedIn(actor);if(actor.id===user.id) {setExpired(false);setSiteAttempt(a=>a+1);setError('Signed in again. Review your form and submit when ready.');}}} />}
   </section>;
 }

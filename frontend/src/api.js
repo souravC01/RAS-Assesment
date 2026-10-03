@@ -16,7 +16,19 @@ export async function api(path, options = {}) {
       : 'The service is unavailable. It may be waking up; try again shortly.'), { status: 0 });
   }
   const json = response.headers.get('content-type')?.includes('application/json');
-  const data = response.status === 204 ? null : json ? await response.json() : null;
+  let data = null;
+  try {
+    if (response.status !== 204) {
+      if (json) data = await response.json();
+      else if (response.ok) throw new Error('Missing JSON response');
+    }
+  } catch (cause) {
+    if (cause.name === 'AbortError') throw cause;
+    if (response.ok) throw Object.assign(new Error(writes
+      ? 'The response was interrupted. Check your history before retrying.'
+      : 'The service response could not be read. Try again shortly.'), { status: 0 });
+    // An unreadable error body must not hide its known HTTP status.
+  }
   if (!response.ok) {
     let status = response.status;
     if (writes && status === 403) {

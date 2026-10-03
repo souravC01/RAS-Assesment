@@ -42,7 +42,7 @@ Requirements: Java 21, Node 24, Docker, and a private Neon `images` bucket. Mave
    $env:S3_ACCESS_KEY_ID='YOUR_BRANCH_ACCESS_KEY'
    $env:S3_SECRET_ACCESS_KEY='YOUR_BRANCH_SECRET'
    cd backend
-   .\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=local
+   .\mvnw.cmd spring-boot:run '-Dspring-boot.run.profiles=local'
    ```
 
    The `local` profile uses PostgreSQL at `localhost:5432`, database `ras`, username `ras`, password `ras-local`. It disables Secure cookies only for local HTTP. Without that profile, set `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, and `SPRING_DATASOURCE_PASSWORD` for a TLS database connection. Schema changes run through Flyway; JPA validates the schema.
@@ -79,7 +79,7 @@ Live passwords are supplied separately in the private credential handoff. For lo
 - BCrypt passwords; active CSRF; HttpOnly/Secure/SameSite=Lax cookies; API responses are no-store. Sessions expire after 30 minutes of inactivity and are lost on API restart. A same-account inline sign-in preserves an in-memory form and its files; writes require explicit retry. Logging out or changing accounts clears prior data/drafts.
 - Photos persist in private Neon storage, not Render disk. Authorized signed links last five minutes and remain usable until expiry, including after logout. The app can refresh a link.
 - Uploads precede a database transaction; failed uploads, duplicate insertion, and database commit failures trigger object cleanup. Process death or failed cleanup can leave orphan objects; a future lifecycle sweep is the appropriate remedy. This version has no durable background cleanup system.
-- A lost response can make write success uncertain. Check history before retrying; the app never automatically retries a submission.
+- A lost response can make write success uncertain. Check history in the offered separate tab before retrying; the draft and photos stay in the original tab. The app never automatically retries a submission. Failed site loading can be retried, and an expired session can be restored inline.
 - Render's free API sleeps when idle. The first request can take a few minutes; wait for it to wake, then sign in. The UI shows pending/error states. Restart also invalidates previous sessions.
 
 ## Data model
