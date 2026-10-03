@@ -154,7 +154,7 @@ assertThat(signedResponse.body()).isEqualTo(uploadedBytes);
 
 **Interfaces:** Consumes Task 2 storage methods. Produces `SubmissionService.create(User actor, CreateSubmission form, List<MultipartFile> photos): Long`, `POST /submissions`, and `GET /sites`. `SubmissionService` receives a `Clock` bean using `America/Vancouver` for deterministic work-date validation. `Photo` has a many-to-one submission relationship and a unique storage key.
 
-- [ ] Write `SubmissionCreateTest.rejectsInvalidFormsAndAcceptsReportedIssues` against real PostgreSQL. Define a valid multipart request inline; use a generated decodable JPEG and authenticated framer. Assert the following results with MockMvc status assertions and repository counts:
+- [x] Write `SubmissionCreateTest.rejectsInvalidFormsAndAcceptsReportedIssues` against real PostgreSQL. Define a valid multipart request inline; use a generated decodable JPEG and authenticated framer. Assert the following results with MockMvc status assertions and repository counts:
 
 ```java
 assertThat(submissionRepository.count()).isEqualTo(1);
@@ -164,12 +164,12 @@ assertThat(saved.getPhotos()).hasSize(1);
 ```
 
 Assert 201 for an ISSUE plus explanatory notes; 400 for missing answers, unknown answer/site, blank issue notes, future date, zero/six photos, malformed/fake JPEG, and overlong notes; 413 for a file above 5,000,000 bytes. Freeze clock at `2026-10-04T06:30:00Z`: Vancouver October 3 accepted, October 4 rejected. Add a worker ID to JSON and prove it cannot change ownership. Admin creation -> 403.
-- [ ] Add `duplicateAndFailureLeaveNoPartialSubmission`: two concurrent creates for the same worker/site/date yield one success and one 409, while a second site succeeds. Mock the concrete storage class to fail on the second upload; assert no new submission/photos and deletion attempted for the first key. Force a DB commit failure after successful uploads and assert rollback plus cleanup. Run `.\mvnw.cmd -Dtest=SubmissionCreateTest test`; expect the new cases to fail.
-- [ ] Implement Flyway constraints: unique `(worker_id,site_id,work_date)`, non-null FKs/date/answers, checks allowing only PASS/ISSUE/NA, and unique photo object key. Use eight explicit answer columns. Set JPA schema handling to validate, not auto-update.
-- [ ] Implement `create` by validating the entire request and bounded image decoding before storage, generating random keys, uploading, and executing the database insert through `TransactionTemplate`. Catch failures outside its commit boundary and attempt deletion of all uploaded keys without masking the original error. Translate the specific duplicate constraint to 409. No durable record exists until all photos succeed. Add a `ponytail:` comment documenting possible orphan objects after process death and lifecycle cleanup as the future remedy.
-- [ ] Implement error responses from the shared contract, including exceptions from multipart parsing and malformed JSON; enforce identity and FRAMER authority server-side. Remove the storage probe and its enabled profile. Seed fictional sites idempotently.
-- [ ] Run `.\mvnw.cmd -Dtest=SubmissionCreateTest,AuthTest test`; expect PASS. Submit once through the deployed API, verify database metadata/private photos, and record proof that the probe route no longer exists.
-- [ ] Commit: `git commit -m "feat: create validated safety submissions"`.
+- [x] Add `duplicateAndFailureLeaveNoPartialSubmission`: two concurrent creates for the same worker/site/date yield one success and one 409, while a second site succeeds. Mock the concrete storage class to fail on the second upload; assert no new submission/photos and deletion attempted for the first key. Force a DB commit failure after successful uploads and assert rollback plus cleanup. Run `.\mvnw.cmd -Dtest=SubmissionCreateTest test`; expect the new cases to fail.
+- [x] Implement Flyway constraints: unique `(worker_id,site_id,work_date)`, non-null FKs/date/answers, checks allowing only PASS/ISSUE/NA, and unique photo object key. Use eight explicit answer columns. Set JPA schema handling to validate, not auto-update.
+- [x] Implement `create` by validating the entire request and bounded image decoding before storage, generating random keys, uploading, and executing the database insert through `TransactionTemplate`. Catch failures outside its commit boundary and attempt deletion of all uploaded keys without masking the original error. Translate the specific duplicate constraint to 409. No durable record exists until all photos succeed. Add a `ponytail:` comment documenting possible orphan objects after process death and lifecycle cleanup as the future remedy.
+- [x] Implement error responses from the shared contract, including exceptions from multipart parsing and malformed JSON; enforce identity and FRAMER authority server-side. Remove the storage probe and its enabled profile. Seed fictional sites idempotently.
+- [x] Run `.\mvnw.cmd -Dtest=SubmissionCreateTest,AuthTest test`; expect PASS. Submit once through the deployed API, verify database metadata/private photos, and record proof that the probe route no longer exists.
+- [x] Commit: `git commit -m "feat: create validated safety submissions"`.
 
 ### Task 4: Authorized history, details, photos, and admin queries
 

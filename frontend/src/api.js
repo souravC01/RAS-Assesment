@@ -20,8 +20,10 @@ export async function api(path, options = {}) {
   if (!response.ok) {
     let status = response.status;
     if (writes && status === 403) {
-      const me = await fetch('/api/auth/me', { credentials: 'same-origin', cache: 'no-store' });
-      if (me.status === 401) status = 401;
+      try {
+        const me = await fetch('/api/auth/me', { credentials: 'same-origin', cache: 'no-store' });
+        if (me.status === 401) status = 401;
+      } catch { /* Keep the known rejection when the diagnostic request cannot reach the service. */ }
     }
     const message = status === 401 ? 'Please sign in to continue.'
       : data?.message || 'The service is unavailable. It may be waking up; try again shortly.';
