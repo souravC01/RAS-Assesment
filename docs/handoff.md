@@ -12,7 +12,7 @@ Supply the admin and both framer passwords privately alongside their emails list
 
 No email has been sent. This is the content checklist for the candidate's final submission.
 
-The assessment PDF is marked confidential and is excluded from the current source tree. Its initial published Git history also needs removal before making this repository public; otherwise keep the repository private and grant evaluator access.
+The confidential assessment PDF is excluded from the source tree and was removed from both published branches' history with the candidate's approval. The candidate's local PDF was preserved.
 
 ## Suggested demonstration
 

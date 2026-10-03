@@ -30,6 +30,7 @@ October 3, 2026. Native implementation with one fresh whole-branch review and on
 - Leave repository visibility and evaluator access with the user — user replied they will eventually make it public, which is a future intention rather than authorization to publish now — evaluator access remains the candidate's final submission step.
 - Exclude the confidential assessment PDF from the current source tree, preserving the local copy — the final requirement check found it tracked in the initial commit despite the planning-only bootstrap request — published history still retains it unless the user approves history rewriting. Explicit approval requested; never force-push without that answer.
 - Rewrite only main and feat/site-safety to remove the confidential PDF after explicit user approval — prepare a disposable local mirror, verify all app/document blobs unchanged, publish with exact expected-head leases and preserve the local PDF — commit IDs change and old clones must refresh; provider deployment hashes remain historical evidence.
+- Update Task7 BASE to f7a36efec6339e4c8a2da1da22712876d0b85123 using the verified commit map — the PDF-only rewrite changed52b2db9's hash while preserving its other files — older hashes in verification remain historical deployment evidence.
 
 ## Review corrections
 
