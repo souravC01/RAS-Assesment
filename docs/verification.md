@@ -89,3 +89,9 @@
 - Final completion gate after the approved history rewrite passed: backend 6 executed/1 opt-in skipped, real storage 1/1, frontend 8/8, clean dependency install/audit0/build, four Chrome recovery scenarios, whitespace checks and tracked-file secret scan.
 
 All accepted product requirements and delivery artifacts have been checked. Repository visibility remains the candidate's submission step; it is still private.
+
+## Follow-up review fixes — October 3
+
+- Stale actor assertion RED: session B plus expected worker A returned 201. GREEN: it returns 412 before any storage interaction or insert; a missing assertion returns 400. A valid assertion still derives ownership from the session and ignores a body-supplied worker ID.
+- Commit acknowledgement RED: the former catch deleted objects after an actual PostgreSQL commit followed by an injected `TransactionSystemException`. GREEN: durable submission/photo rows remain and their objects are retained. A second test actually rolls back but reports an unknown outcome; it also retains objects conservatively. These tests inject acknowledgement loss after a real database outcome rather than cutting a live network socket. Existing deferred-constraint and duplicate tests still prove confirmed failure compensation.
+- Full regression gate: backend 9 executed/1 opt-in skipped, explicit Neon storage 1/1, frontend 9/9, clean install/audit0/build, and the four previous Chrome recovery scenarios passed. The new Chrome scenarios cover cross-tab logout/login, focus-triggered account change, the server assertion race with tab broadcasts disabled, and same-user expiry/re-login retaining draft fields/photos. The three account-change scenarios failed before the fix; all four now pass with no unintended creation or automatic write retry.

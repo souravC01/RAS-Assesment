@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { api, logout } from './api.js';
+import { useEffect, useRef, useState } from 'react';
+import { api, logout, SESSION_REFRESH_EVENT } from './api.js';
 import Login from './pages/Login.jsx';
 import {BrowserRouter,Routes,Route,Navigate,Link,useNavigate,useParams} from 'react-router-dom';
 import WorkerHistory from './pages/WorkerHistory.jsx';
@@ -13,19 +13,38 @@ function Application() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const actorRef=useRef(null),syncSequence=useRef(0),accountChannel=useRef(null);
+  function applyActor(actor,navigateOnChange=false) {
+    const previous=actorRef.current;actorRef.current=actor;setUser(actor);setError('');setLoading(false);
+    if(navigateOnChange&&previous?.id!==actor?.id)navigate(actor?actor.role==='ADMIN'?'/admin':'/submissions':'/login');
+  }
   useEffect(() => {
     let active = true;
-    api('/auth/me').then(actor => { if (active) setUser(actor); })
-      .catch(failure => { if (active && failure.status !== 401) setError(failure.message); })
-      .finally(() => { if (active) setLoading(false); });
-    return () => { active = false; };
+    async function synchronize() {
+      const sequence=++syncSequence.current;
+      try {const actor=await api('/auth/me');if(active&&sequence===syncSequence.current)applyActor(actor,!!actorRef.current);}
+      catch(failure){if(active&&sequence===syncSequence.current&&failure.status!==401)setError(failure.message);}
+      // Background expiry retains a same-account draft; explicit logout clears it below.
+      finally{if(active&&sequence===syncSequence.current)setLoading(false);}
+    }
+    function changed(message) {
+      if(message.data?.type==='logout'){++syncSequence.current;applyActor(null,true);}
+      else if(message.data?.type==='login')synchronize();
+    }
+    function visible(){if(document.visibilityState==='visible')synchronize();}
+    let channel;
+    if(typeof BroadcastChannel!=='undefined'){channel=new BroadcastChannel('ras-account');channel.onmessage=changed;accountChannel.current=channel;}
+    window.addEventListener('focus',synchronize);window.addEventListener(SESSION_REFRESH_EVENT,synchronize);
+    document.addEventListener('visibilitychange',visible);synchronize();
+    return () => {active=false;++syncSequence.current;channel?.close();accountChannel.current=null;
+      window.removeEventListener('focus',synchronize);window.removeEventListener(SESSION_REFRESH_EVENT,synchronize);document.removeEventListener('visibilitychange',visible);};
   }, []);
   async function signOut() {
-    try { await logout(); setUser(null); setError(''); navigate('/login'); }
-    catch (failure) { if (failure.status === 401) {setUser(null);navigate('/login');} else setError(failure.message); }
+    try { await logout(); ++syncSequence.current;applyActor(null,true);accountChannel.current?.postMessage({type:'logout'}); }
+    catch (failure) { if (failure.status === 401) {++syncSequence.current;applyActor(null,true);accountChannel.current?.postMessage({type:'logout'});} else setError(failure.message); }
   }
   const home=user?.role==='ADMIN'?'/admin':'/submissions';
-  function signedIn(actor) {const same=actor.id===user?.id;setUser(actor);setError('');if(!same)navigate(actor.role==='ADMIN'?'/admin':'/submissions');}
+  function signedIn(actor) {++syncSequence.current;applyActor(actor,true);accountChannel.current?.postMessage({type:'login'});}
   return <><header className="app-header"><div className="header-inner"><Link className="wordmark" to={user?home:'/login'}><img src="/ras-logo.png" alt="Ron Anderson & Sons Ltd." /><span>Site safety</span></Link>
     {user&&<div className="account"><span>{user.name} · {user.role==='ADMIN'?'Admin':'Framer'}</span><button className="secondary" onClick={signOut}>Sign out</button></div>}</div></header><main>
     {error && <p className="error" role="alert">{error}</p>}

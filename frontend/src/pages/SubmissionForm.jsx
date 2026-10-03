@@ -31,7 +31,7 @@ export default function SubmissionForm({user,onCreated,onSignedIn}) {
     if(photos.length===0) {setError('Add at least one supporting photo.');return;}
     const body=new FormData();body.append('form',new Blob([JSON.stringify({siteId:Number(siteId),workDate,checklist:checks,notes})],{type:'application/json'}));
     photos.forEach(file=>body.append('photos',file,file.name));setPending(true);
-    try {const result=await api('/submissions',{method:'POST',body});onCreated(result.id);}
+    try {const result=await api('/submissions',{method:'POST',body,expectedActorId:user.id});onCreated(result.id);}
     catch(failure) {setError(failure.message);setFields(failure.fieldErrors||{});setExpired(failure.status===401);
       setUncertain(failure.status===0||failure.status>=500||failure.status===409);}
     finally {setPending(false);}

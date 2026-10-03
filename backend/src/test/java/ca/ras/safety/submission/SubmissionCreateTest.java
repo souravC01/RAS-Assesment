@@ -61,10 +61,21 @@ class SubmissionCreateTest {
     private MockMultipartHttpServletRequestBuilder request(String json, MockMultipartFile... photos) {
         var request=multipart("/api/submissions").file(new MockMultipartFile("form","","application/json",json.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
         for(var photo:photos) request.file(photo);
-        return request.with(user("framer.a@example.test").roles("FRAMER")).with(csrf());
+        return request.header("X-Expected-Actor",db.queryForObject("select id from app_users where email='framer.a@example.test'",Long.class))
+            .with(user("framer.a@example.test").roles("FRAMER")).with(csrf());
     }
     private long site(int index) {
         return db.queryForList("select id from job_sites order by name",Long.class).get(index);
+    }
+    @Test void staleOrMissingActorCannotCreateUnderAnotherSession() throws Exception {
+        String valid=form(site(0),"2026-10-03");
+        mvc.perform(request(valid,jpeg()).with(user("framer.b@example.test").roles("FRAMER")))
+            .andExpect(status().isPreconditionFailed());
+        var missing=multipart("/api/submissions").file(new MockMultipartFile("form","","application/json",valid.getBytes(java.nio.charset.StandardCharsets.UTF_8))).file(jpeg());
+        mvc.perform(missing.with(user("framer.a@example.test").roles("FRAMER")).with(csrf()))
+            .andExpect(status().isBadRequest());
+        verifyNoInteractions(storage);
+        assertThat(db.queryForObject("select count(*) from submissions",Long.class)).isZero();
     }
     @Test void rejectsInvalidFormsAndAcceptsReportedIssues() throws Exception {
         // Read-only lookup is also an assessment requirement.

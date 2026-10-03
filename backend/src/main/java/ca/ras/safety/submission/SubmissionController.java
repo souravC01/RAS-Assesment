@@ -18,8 +18,13 @@ public class SubmissionController {
     public SubmissionController(SubmissionService submissions,UserRepository users) { this.submissions=submissions;this.users=users; }
     @PostMapping("/api/submissions") @ResponseStatus(HttpStatus.CREATED)
     Map<String,Long> create(@RequestPart("form") @Valid CreateSubmission form,
-        @RequestPart(value="photos",required=false) List<MultipartFile> photos,Authentication auth) {
-        return Map.of("id",submissions.create(actor(auth),form,photos));
+        @RequestPart(value="photos",required=false) List<MultipartFile> photos,
+        @RequestHeader(value="X-Expected-Actor",required=false) Long expectedActor,Authentication auth) {
+        var signedIn=actor(auth);
+        if(expectedActor==null) throw new Failure(400,"Refresh the page before starting a safety form.");
+        if(!signedIn.getId().equals(expectedActor))
+            throw new Failure(412,"Your account changed. Start a new form under the current account.");
+        return Map.of("id",submissions.create(signedIn,form,photos));
     }
     @GetMapping("/api/submissions") List<SubmissionRow> history(Authentication auth) { return submissions.history(actor(auth)); }
     @GetMapping("/api/submissions/{id}") SubmissionDetail detail(@PathVariable Long id,Authentication auth) { return submissions.detail(actor(auth),id); }
