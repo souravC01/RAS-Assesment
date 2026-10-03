@@ -5,6 +5,7 @@ import {BrowserRouter,Routes,Route,Navigate,Link,useNavigate,useParams} from 're
 import WorkerHistory from './pages/WorkerHistory.jsx';
 import SubmissionForm from './pages/SubmissionForm.jsx';
 import SubmissionDetail from './pages/SubmissionDetail.jsx';
+import AdminDashboard from './pages/AdminDashboard.jsx';
 
 function DetailRoute({user}) {const {id}=useParams();return <SubmissionDetail id={id} user={user} />;}
 function Application() {
@@ -25,7 +26,7 @@ function Application() {
   }
   const home=user?.role==='ADMIN'?'/admin':'/submissions';
   function signedIn(actor) {const same=actor.id===user?.id;setUser(actor);setError('');if(!same)navigate(actor.role==='ADMIN'?'/admin':'/submissions');}
-  return <><header className="app-header"><div className="header-inner"><Link className="wordmark" to={user?home:'/login'}>RAS <span>Site safety</span></Link>
+  return <><header className="app-header"><div className="header-inner"><Link className="wordmark" to={user?home:'/login'}><img src="/ras-logo.png" alt="Ron Anderson & Sons Ltd." /><span>Site safety</span></Link>
     {user&&<div className="account"><span>{user.name} · {user.role==='ADMIN'?'Admin':'Framer'}</span><button className="secondary" onClick={signOut}>Sign out</button></div>}</div></header><main>
     {error && <p className="error" role="alert">{error}</p>}
     {loading ? <p role="status">Connecting to site safety…</p> : !user
@@ -34,7 +35,7 @@ function Application() {
         <Route path="/submissions" element={user.role==='FRAMER'?<WorkerHistory />:<Navigate to="/admin" replace />} />
         <Route path="/submissions/new" element={user.role==='FRAMER'?<SubmissionForm user={user} onSignedIn={signedIn} onCreated={id=>navigate(`/submissions/${id}`)} />:<Navigate to="/admin" replace />} />
         <Route path="/submissions/:id" element={<DetailRoute user={user} />} />
-        <Route path="/admin" element={user.role==='ADMIN'?<section className="panel"><h1>Admin dashboard</h1><p>Submission access is available; dashboard filters are being completed.</p></section>:<Navigate to="/submissions" replace />} />
+        <Route path="/admin" element={user.role==='ADMIN'?<AdminDashboard />:<Navigate to="/submissions" replace />} />
         <Route path="*" element={<Navigate to={home} replace />} /></Routes>}
   </main><footer>RAS · Daily site safety records</footer></>;
 }
