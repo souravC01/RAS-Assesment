@@ -177,7 +177,7 @@ Assert 201 for an ISSUE plus explanatory notes; 400 for missing answers, unknown
 
 **Interfaces:** `SubmissionService.history(User): List<SubmissionRow>`; `detail(User, Long id): SubmissionDetail`; `search(SubmissionFilter): AdminResult`. `PhotoController.url(Long id, Authentication): PhotoUrl` authorizes using the parent submission. `AdminResult(List<SubmissionRow> items,List<SiteCount> countsBySite)` and the remaining HTTP contracts use the exact property names above.
 
-- [ ] Write `SubmissionReadTest.enforcesOwnershipAndInclusiveFilters` with two framers, two sites, and three work dates. Assert A's history excludes B, A's request for B's detail/photo returns 404, A's admin route returns 403, and admin can read both. Ensure storage presigning is never invoked for denied access.
+- [x] Write `SubmissionReadTest.enforcesOwnershipAndInclusiveFilters` with two framers, two sites, and three work dates. Assert A's history excludes B, A's request for B's detail/photo returns 404, A's admin route returns 403, and admin can read both. Ensure storage presigning is never invoked for denied access.
 
 ```java
 mockMvc.perform(get("/api/submissions/" + bSubmissionId).session(aSession))
@@ -189,11 +189,11 @@ mockMvc.perform(get("/api/admin/submissions").session(adminSession)
 ```
 
 Seed exactly two October 3 records at the same site for these assertions. Also test each filter alone/together, omitted filters, unknown IDs, reversed dates, empty results, and an unauthorized request after another user's cached-looking successful request. Assert no-store for details and photo URLs.
-- [ ] Run `.\mvnw.cmd -Dtest=SubmissionReadTest test`; expect failure before read routes exist.
-- [ ] Implement owner-scoped repository reads and admin-only search, with the same filtered result feeding rows and per-site counts. Group that small list in Java; add `ponytail: loads the assessment dataset; paginate and aggregate in SQL if volume grows`. Return zero-count results as an empty counts list, not misleading global totals. Fetch required relationships before mapping DTOs; do not depend on open-session-in-view.
-- [ ] Implement `/admin/workers` and permission-checked 5-minute photo URLs; return UTC `expiresAt`. UUID/random keys supplement authorization, never replace it.
-- [ ] Run `.\mvnw.cmd -Dtest=SubmissionReadTest,SubmissionCreateTest,AuthTest test`; expect PASS. Manually verify cross-user URL guessing on the deployment.
-- [ ] Commit: `git commit -m "feat: add authorized history and admin filters"`.
+- [x] Run `.\mvnw.cmd -Dtest=SubmissionReadTest test`; expect failure before read routes exist.
+- [x] Implement owner-scoped repository reads and admin-only search, with the same filtered result feeding rows and per-site counts. Group that small list in Java; add `ponytail: loads the assessment dataset; paginate and aggregate in SQL if volume grows`. Return zero-count results as an empty counts list, not misleading global totals. Fetch required relationships before mapping DTOs; do not depend on open-session-in-view.
+- [x] Implement `/admin/workers` and permission-checked 5-minute photo URLs; return UTC `expiresAt`. UUID/random keys supplement authorization, never replace it.
+- [x] Run `.\mvnw.cmd -Dtest=SubmissionReadTest,SubmissionCreateTest,AuthTest test`; expect PASS. Manually verify cross-user URL guessing on the deployment.
+- [x] Commit: `git commit -m "feat: add authorized history and admin filters"`.
 
 ### Task 5: Complete the mobile worker flow
 
@@ -201,7 +201,7 @@ Seed exactly two October 3 records at the same site for these assertions. Also t
 
 **Interfaces:** `SubmissionForm({user,onCreated})`, `WorkerHistory({onOpen,onNew})`, `SubmissionDetail({id,onBack})`. `api.js` consumes the shared HTTP contract and sends the current CSRF token for writes. Keep the draft in app memory across an inline re-login; never persist files or session tokens to browser storage. `onCreated(id)` opens the detail only after a 201 response.
 
-- [ ] Add built-in Node tests `doesNotRetryWrites` and `reportsExpiredSession` in `api.test.js`, stubbing global fetch with the runner's mocking support. Add `"test":"node --test src/api.test.js"` to package scripts.
+- [x] Add built-in Node tests `doesNotRetryWrites` and `reportsExpiredSession` in `api.test.js`, stubbing global fetch with the runner's mocking support. Add `"test":"node --test src/api.test.js"` to package scripts.
 
 ```javascript
 await assert.rejects(api('/submissions', { method: 'POST', body: form }),
@@ -210,11 +210,11 @@ assert.equal(writeCalls, 1);
 ```
 
 The test supplies FormData, a CSRF-token response, and a 401 response for the write. Repeat with write 403 followed by `/auth/me` 401: expect the same 401 classification and exactly one write. With `/me` 200, preserve the 403. Add a non-JSON proxy error case: the user receives a readable service error, not a JSON parsing exception. Run `npm test`; expect failures before the helper handles these cases.
-- [ ] Implement the request helper and a minimal route structure in `App.jsx` with React Router: `/login`, `/submissions`, `/submissions/new`, `/submissions/:id`, `/admin`. Do not redirect away from an expired-session form and discard its state; show re-login inline, refresh CSRF after login, and require an explicit retry. On logout/account change clear prior records and drafts. On uncertain write results, offer history verification before retrying.
-- [ ] Implement the eight native answer groups with no preselection, site/date fields, 4,000-character notes, photo add/remove/previews, size/type/count feedback, and disabled submit while pending. Backend checks remain authoritative. Derive today via `Intl.DateTimeFormat` with `timeZone:'America/Vancouver'` and `formatToParts`; preserve API `YYYY-MM-DD` strings instead of parsing them as UTC dates.
-- [ ] Implement history and read-only details with plain text rendering of notes (no HTML injection). Fetch authorized photo URLs on demand; refresh expired links without making the bucket public. Revoke preview object URLs when no longer needed. Show honest empty/loading/error states.
-- [ ] Run `npm test` and `npm run build`; expect PASS/success. At a 375px viewport, submit an ISSUE with notes/photo, verify history/detail, force session expiry mid-form, re-login as the same user, and confirm fields/files survive. Repeat with a browser timezone different from Vancouver; the work date must not shift. Record these scenarios in `docs/verification.md`.
-- [ ] Commit: `git commit -m "feat: complete mobile safety form flow"`.
+- [x] Implement the request helper and a minimal route structure in `App.jsx` with React Router: `/login`, `/submissions`, `/submissions/new`, `/submissions/:id`, `/admin`. Do not redirect away from an expired-session form and discard its state; show re-login inline, refresh CSRF after login, and require an explicit retry. On logout/account change clear prior records and drafts. On uncertain write results, offer history verification before retrying.
+- [x] Implement the eight native answer groups with no preselection, site/date fields, 4,000-character notes, photo add/remove/previews, size/type/count feedback, and disabled submit while pending. Backend checks remain authoritative. Derive today via `Intl.DateTimeFormat` with `timeZone:'America/Vancouver'` and `formatToParts`; preserve API `YYYY-MM-DD` strings instead of parsing them as UTC dates.
+- [x] Implement history and read-only details with plain text rendering of notes (no HTML injection). Fetch authorized photo URLs on demand; refresh expired links without making the bucket public. Revoke preview object URLs when no longer needed. Show honest empty/loading/error states.
+- [x] Run `npm test` and `npm run build`; expect PASS/success. At a 375px viewport, submit an ISSUE with notes/photo, verify history/detail, force session expiry mid-form, re-login as the same user, and confirm fields/files survive. Repeat with a browser timezone different from Vancouver; the work date must not shift. Record these scenarios in `docs/verification.md`.
+- [x] Commit: `git commit -m "feat: complete mobile safety form flow"`.
 
 ### Task 6: Finish the admin dashboard and RAS styling
 
@@ -222,11 +222,11 @@ The test supplies FormData, a CSRF-token response, and a 401 response for the wr
 
 **Interfaces:** `AdminDashboard({onOpen})` consumes `/sites`, `/admin/workers`, and `/admin/submissions`. Reuses `SubmissionDetail`. The apply-filters action sends only non-empty values; reset clears all four filters. Summary and table come from the same response.
 
-- [ ] Before implementing, record a failing browser acceptance check: admin selects one worker, one site, and an inclusive date range; expects matching rows and counts, with columns Worker / Site / Date / Status. Also specify rapid filter changes must not show an older response, and empty results must clear prior summary counts.
-- [ ] Implement the filters, table, per-site counts, and detail navigation. Use AbortController or a request sequence guard to discard stale responses. Present loading state without showing previous results as if they match new filters. No review action or charts.
-- [ ] Retrieve the official logo from [RAS's website](https://www.rasltd.ca/), verify any Instagram link through official cross-linking, and record asset provenance. Sample colors from the official asset/site; treat white/charcoal as application neutrals, not claimed brand standards. If Instagram is inaccessible, record that fact rather than inventing a handle. Apply visible labels, keyboard focus, non-color-only issue labels, touch targets of at least 44px, and a readable narrow-screen table layout.
-- [ ] Run `npm test` and `npm run build`; expect success. Repeat the failing acceptance scenario, rapid changes, no matches, keyboard navigation, worker/admin account switching, and a 375px viewport. Record actual outcomes; do not create a new UI test framework solely for these presentation checks.
-- [ ] Commit: `git commit -m "feat: add branded admin dashboard"`.
+- [x] Before implementing, record a failing browser acceptance check: admin selects one worker, one site, and an inclusive date range; expects matching rows and counts, with columns Worker / Site / Date / Status. Also specify rapid filter changes must not show an older response, and empty results must clear prior summary counts.
+- [x] Implement the filters, table, per-site counts, and detail navigation. Use AbortController or a request sequence guard to discard stale responses. Present loading state without showing previous results as if they match new filters. No review action or charts.
+- [x] Retrieve the official logo from [RAS's website](https://www.rasltd.ca/), verify any Instagram link through official cross-linking, and record asset provenance. Sample colors from the official asset/site; treat white/charcoal as application neutrals, not claimed brand standards. If Instagram is inaccessible, record that fact rather than inventing a handle. Apply visible labels, keyboard focus, non-color-only issue labels, touch targets of at least 44px, and a readable narrow-screen table layout.
+- [x] Run `npm test` and `npm run build`; expect success. Repeat the failing acceptance scenario, rapid changes, no matches, keyboard navigation, worker/admin account switching, and a 375px viewport. Record actual outcomes; do not create a new UI test framework solely for these presentation checks.
+- [x] Commit: `git commit -m "feat: add branded admin dashboard"`.
 
 ### Task 7: Verify the deployed assessment and package delivery
 
