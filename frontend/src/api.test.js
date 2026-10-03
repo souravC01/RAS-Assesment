@@ -2,6 +2,16 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { api } from './api.js';
 
+test('submission carries displayed actor as a server precondition', async t => {
+  let observed;
+  t.mock.method(globalThis,'fetch',async(path,options)=>{
+    if(path.endsWith('/csrf'))return Response.json({headerName:'X-CSRF-TOKEN',token:'token'});
+    observed=options.headers.get('X-Expected-Actor');return Response.json({id:1},{status:201});
+  });
+  await api('/submissions',{method:'POST',body:new FormData(),expectedActorId:2});
+  assert.equal(observed,'2');
+});
+
 test('interrupted successful write response offers history without repeating the write', async t => {
   let writes=0;
   t.mock.method(globalThis,'fetch',async path=>{

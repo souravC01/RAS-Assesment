@@ -1,14 +1,17 @@
+export const SESSION_REFRESH_EVENT='ras-session-refresh';
 export async function api(path, options = {}) {
+  const {expectedActorId,...requestOptions}=options;
   const method = (options.method || 'GET').toUpperCase();
   const writes = !['GET', 'HEAD', 'OPTIONS'].includes(method);
   const headers = new Headers(options.headers);
   if (writes) {
     const csrf = await api('/auth/csrf');
     headers.set(csrf.headerName, csrf.token);
+    if(expectedActorId!==undefined)headers.set('X-Expected-Actor',String(expectedActorId));
   }
   let response;
   try {
-    response = await fetch(`/api${path}`, { ...options, method, headers, credentials: 'same-origin', cache: 'no-store' });
+    response = await fetch(`/api${path}`, { ...requestOptions, method, headers, credentials: 'same-origin', cache: 'no-store' });
   } catch (cause) {
     if (cause.name === 'AbortError') throw cause;
     throw Object.assign(new Error(writes
@@ -31,6 +34,7 @@ export async function api(path, options = {}) {
   }
   if (!response.ok) {
     let status = response.status;
+    if(status===412&&typeof window!=='undefined')window.dispatchEvent(new Event(SESSION_REFRESH_EVENT));
     if (writes && status === 403) {
       try {
         const me = await fetch('/api/auth/me', { credentials: 'same-origin', cache: 'no-store' });

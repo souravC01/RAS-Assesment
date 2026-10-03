@@ -41,3 +41,8 @@ October 3, 2026. Native implementation with one fresh whole-branch review and on
 ## Deferred minors
 
 None raised by the final reviewer.
+
+## User-requested follow-up review fixes
+
+- Bind each draft's expected account to the create request and compare it with the authenticated session before uploading; synchronize tabs on login/logout and refresh identity on focus or visibility changes. This prevents stale drafts being recorded under a new session account while preserving same-account re-login recovery.
+- Compensate uploads only after established rollback or PostgreSQL constraint rejection. Retain objects when commit acknowledgement is unknown, including when an immediate read would show no rows. A completed outcome must be reconciled before deletion; the assessment deliberately accepts possible orphan objects rather than deleting photos for a durable submission.

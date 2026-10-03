@@ -10,9 +10,13 @@ import java.io.IOException;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.*;
+import java.sql.SQLException;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.imageio.ImageIO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,6 +46,7 @@ public class SubmissionService {
         var contents=new ArrayList<byte[]>();
         for(var photo:photos) contents.add(validatePhoto(photo));
         var keys=new ArrayList<String>();
+        var completionStatus=new AtomicInteger(TransactionSynchronization.STATUS_ROLLED_BACK);
         try {
             for(int i=0;i<photos.size();i++) {
                 String key="submissions/"+UUID.randomUUID();
@@ -49,21 +54,34 @@ public class SubmissionService {
                 storage.put(key,contents.get(i),photos.get(i).getContentType());
             }
             return transaction.execute(tx->{
+                completionStatus.set(TransactionSynchronization.STATUS_UNKNOWN);
+                TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                    @Override public void afterCompletion(int status) { completionStatus.set(status); }
+                });
                 var submission=new Submission(actor,site,form,clock.instant());
                 for(int i=0;i<photos.size();i++) submission.addPhoto(new Photo(submission,keys.get(i),
                     photos.get(i).getContentType(),contents.get(i).length));
                 return submissions.saveAndFlush(submission).getId();
             });
         } catch(RuntimeException ex) {
-            // ponytail: Process death can leave an orphan object; a storage lifecycle sweep is the future remedy.
-            for(String key:keys) try { storage.delete(key); } catch(RuntimeException cleanup) { ex.addSuppressed(cleanup); }
+            boolean rolledBack=completionStatus.get()==TransactionSynchronization.STATUS_ROLLED_BACK;
+            boolean rejected=completionStatus.get()!=TransactionSynchronization.STATUS_COMMITTED && constraintRejected(ex);
+            // An unknown COMMIT may have saved the rows. Retain objects until its outcome is established.
+            // ponytail: Process death or unknown commits can leave orphans; reconcile before any future sweep.
+            if(rolledBack||rejected)
+                for(String key:keys) try { storage.delete(key); } catch(RuntimeException cleanup) { ex.addSuppressed(cleanup); }
             for(Throwable cause=ex;cause!=null;cause=cause.getCause()) {
                 if(cause instanceof org.hibernate.exception.ConstraintViolationException constraint
                     && "uq_worker_site_date".equals(constraint.getConstraintName()))
                     throw new Failure(409,"You already submitted a form for this site and date.");
             }
-            throw new Failure(503,"The submission could not be saved. Please check your history before trying again.");
+            throw new Failure(503,"The submission result could not be confirmed. Please check your history before trying again.");
         }
+    }
+    private static boolean constraintRejected(Throwable failure) {
+        for(Throwable cause=failure;cause!=null;cause=cause.getCause())
+            if(cause instanceof SQLException sql && sql.getSQLState()!=null && sql.getSQLState().startsWith("23")) return true;
+        return false;
     }
     private byte[] validatePhoto(MultipartFile photo) {
         if(photo.getSize()>5_000_000) throw new Failure(413,"Each photo must be at most 5 MB.",Map.of("photos","Photo too large."));
