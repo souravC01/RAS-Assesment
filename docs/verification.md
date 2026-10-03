@@ -27,8 +27,21 @@
 
 - 2026-10-03 16:39 UTC: HTTP checks through `https://ras-assessment.onrender.com` passed for health, anonymous 401, login without CSRF 403, wrong password 401, admin/framer login, repeated session reads, and logout.
 - Session cookies verified Secure, HttpOnly, SameSite=Lax, Path=/, with no Domain attribute; authenticated reads returned `Cache-Control: no-store`.
-- This verifies the actual static-site API rewrite. The in-app browser tool failed to start; visual browser interaction remains outstanding.
+- This verifies the actual static-site API rewrite. The in-app browser tool failed to start; the bundled Playwright runtime with installed Chrome then verified the real mobile browser flow.
+- Real Chrome at 390×844: framer/admin login, reload, logout, account switching, secure cookie flags, no page errors, and no horizontal overflow passed.
 - Backend: `https://ras-assessment-api.onrender.com`; initial Render deploy connected to Neon successfully using TLS with server certificate verification.
 - Protected storage probe tests: 3/3 passed alongside AuthTest 2/2, covering admin access, framer denial, missing CSRF, invalid images/count, and oversized files.
 
-Maximum-size multipart delivery and the complete app remain to be verified.
+## Hosted maximum-size photos
+
+- 2026-10-03T16:45:41Z: five valid 5,000,000-byte JPEG files (25,000,000 image bytes plus multipart framing) passed through the frontend rewrite to the protected API.
+- All five signed reads returned identical bytes; unsigned reads were denied. Malformed image -> 400; oversized image -> 413.
+- All five probe objects were deleted. The temporary profile and endpoint are removed in the submission implementation.
+
+## Submission logic
+
+- SubmissionCreateTest RED: two missing `/sites` route failures before implementation.
+- GREEN: SubmissionCreateTest 2/2 and AuthTest 2/2 passed, including required answers, issue notes, content validation, ownership, Vancouver date boundary, concurrent duplicate, second-upload failure, and a deferred PostgreSQL commit failure with object cleanup.
+- Database migrations enforce required values, allowed answers, unique worker/site/date, foreign keys, and photo sizes/keys.
+
+Complete app behavior remains to be verified.
