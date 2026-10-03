@@ -62,6 +62,19 @@
 
 - Admin acceptance RED: Worker filter absent from the placeholder screen.
 - Official green logo and sampled `#0d553a` are documented in [brand.md](brand.md). Instagram cross-link verified; direct content fetch unavailable.
-- Admin browser acceptance is pending deployment.
+- Admin Chrome acceptance passed: combined worker/site/inclusive dates, matching table/counts, empty counts cleared, delayed older responses discarded, detail navigation, keyboard focus, account switch and 375px layout.
+- The mobile table initially leaked an absolutely positioned hidden header outside its scroll area. Native header labeling removed that overflow; the browser check passed afterward.
+
+## Final assessment checks
+
+- `mvnw.cmd clean verify`: BUILD SUCCESS; 6 executed tests passed against fresh PostgreSQL containers. The opt-in storage test was skipped in that ordinary suite.
+- Explicit `STORAGE_SMOKE=true`, `mvnw.cmd -Dtest=PhotoStorageTest test`: 1 executed, 0 skipped, passed using real Neon storage.
+- `npm ci`, 6 request/date tests, and production build passed; frontend dependency audit reported zero vulnerabilities.
+- Permanent hosted endpoint: five 5,000,000-byte photos returned 201; all five authorized signed reads returned exact bytes. Repeating the site/date returned 409 and history contained one record.
+- Storage/database reconciliation: 5 fictional submissions, 9 photo rows, 9 private objects, 40,002,000 bytes, zero probe objects. This confirms duplicate compensation left no additional objects.
+- Browser network failure preserved draft/files, offered history verification, and issued exactly one write. Different-account re-login cleared the former user's draft.
+- ERD rendered with one-off Mermaid CLI 12.0.0 and visually inspected against both migrations. No diagram runtime was added to the app.
+- Live account passwords are in a Git-ignored private handoff; no provider credentials or demo passwords are in committed delivery documents.
+- Render idle wake verification and fresh whole-branch review are in progress; final results will be appended.
 
 Complete app behavior remains to be verified.

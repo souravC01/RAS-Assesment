@@ -12,3 +12,4 @@ skills-lock.json
 tmp/
 .neon
 node_modules/
+docs/demo-credentials.private.md

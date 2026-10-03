@@ -1,0 +1,38 @@
+erDiagram
+    APP_USERS ||--o{ SUBMISSIONS : submits
+    JOB_SITES ||--o{ SUBMISSIONS : receives
+    SUBMISSIONS ||--|{ PHOTOS : "requires 1-5 (service validation)"
+    APP_USERS {
+        bigint id PK
+        varchar name
+        varchar email UK
+        varchar password_hash "BCrypt"
+        varchar role "FRAMER or ADMIN"
+    }
+    JOB_SITES {
+        bigint id PK
+        varchar name UK
+    }
+    SUBMISSIONS {
+        bigint id PK
+        bigint worker_id FK "UNIQUE(worker_id, site_id, work_date)"
+        bigint site_id FK
+        date work_date "Vancouver calendar date"
+        timestamptz submitted_at "UTC instant"
+        varchar notes "max 4000; required for ISSUE"
+        varchar hard_hat "PASS / ISSUE / NA"
+        varchar high_visibility_vest
+        varchar safety_boots
+        varchar eye_protection
+        varchar fall_protection
+        varchar ladders_scaffolds
+        varchar tools_cords
+        varchar hazards_controlled
+    }
+    PHOTOS {
+        bigint id PK
+        bigint submission_id FK
+        varchar storage_key UK "private Neon object"
+        varchar content_type "JPEG or PNG"
+        bigint byte_size "1-5000000 bytes"
+    }
