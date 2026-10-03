@@ -55,6 +55,13 @@
 
 - Browser RED: the foundation lacked the worker history screen.
 - Unit RED: Vancouver date conversion missing and failed session diagnosis masked a 403. GREEN: all 6 request/date tests passed and the production build succeeded.
-- Hosted worker acceptance is pending deployment of these screens.
+- The worker browser scenario verifies issue notes/photo, a 375px viewport, mid-form cookie expiry, inline same-account sign-in with unchanged fields/files, explicit submit, private photo loading, history/detail, and an Asia/Kolkata browser retaining the selected Vancouver work date.
+- A nested textarea label initially included its entered text; using a separate `htmlFor` label fixed the browser-accessible Notes label. The completed browser run is recorded with the task ledger.
+
+## Admin UI and branding
+
+- Admin acceptance RED: Worker filter absent from the placeholder screen.
+- Official green logo and sampled `#0d553a` are documented in [brand.md](brand.md). Instagram cross-link verified; direct content fetch unavailable.
+- Admin browser acceptance is pending deployment.
 
 Complete app behavior remains to be verified.
