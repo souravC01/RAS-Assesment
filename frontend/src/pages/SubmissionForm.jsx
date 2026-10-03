@@ -41,7 +41,7 @@ export default function SubmissionForm({user,onCreated,onSignedIn}) {
       <fieldset disabled={pending||expired} className="form-fields">
         <section className="panel"><h2>Site and date</h2><div className="form-fields">
           <label>Framer<input value={user.name} readOnly /></label>
-          <label>Job site<select required value={siteId} onChange={e=>setSiteId(e.target.value)}><option value="">Select a job site</option>{sites.map(site=><option value={site.id} key={site.id}>{site.name}</option>)}</select></label>
+          <div className="filter-field"><label htmlFor="form-site">Job site</label><select id="form-site" required value={siteId} onChange={e=>setSiteId(e.target.value)}><option value="">Select a job site</option>{sites.map(site=><option value={site.id} key={site.id}>{site.name}</option>)}</select></div>
           <label>Work date<input type="date" required value={workDate} max={today()} onChange={e=>setWorkDate(e.target.value)} /></label>
           <small>Dates follow America/Vancouver.</small>
         </div></section>
