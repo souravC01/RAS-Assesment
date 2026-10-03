@@ -4,7 +4,7 @@ Application: https://ras-assessment.onrender.com
 
 Repository: https://github.com/souravC01/RAS-Assesment (currently private; candidate plans to make it public before submission, or must grant evaluator access)
 
-PR: https://github.com/souravC01/RAS-Assesment/pull/1
+PR: https://github.com/souravC01/RAS-Assesment/pull/2
 
 ERD: [erd.png](erd.png); setup and assumptions: [README](../README.md); validation: [verification.md](verification.md).
 

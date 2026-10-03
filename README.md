@@ -5,7 +5,7 @@ A mobile React app for framers to submit daily safety checks and photos, with an
 - **Live app:** https://ras-assessment.onrender.com
 - **API health:** https://ras-assessment-api.onrender.com/api/health
 - **Repository:** https://github.com/souravC01/RAS-Assesment
-- **Pull request:** https://github.com/souravC01/RAS-Assesment/pull/1
+- **Pull request:** https://github.com/souravC01/RAS-Assesment/pull/2
 
 The repository is currently private. The candidate plans to make it public before submission; otherwise, grant the evaluator GitHub access. The app is a fictional assessment demo; Submitted means recorded for inspection, not certified safe.
 
