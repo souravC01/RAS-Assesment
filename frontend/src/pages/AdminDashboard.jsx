@@ -20,8 +20,8 @@ export default function AdminDashboard() {
   return <section><p className="eyebrow">Admin overview</p><h1>All submissions</h1><p>Inspect daily safety records across your framers and job sites.</p>
     <section className="panel filters"><h2>Find submissions</h2>
       <form onSubmit={e=>{e.preventDefault();setResult(null);setApplied({...draft});}}>
-        <div className="filter-grid"><label>Worker<select value={draft.workerId} onChange={e=>field('workerId',e.target.value)}><option value="">All framers</option>{workers.map(worker=><option key={worker.id} value={worker.id}>{worker.name}</option>)}</select></label>
-          <label>Job site<select value={draft.siteId} onChange={e=>field('siteId',e.target.value)}><option value="">All job sites</option>{sites.map(site=><option key={site.id} value={site.id}>{site.name}</option>)}</select></label>
+        <div className="filter-grid"><div className="filter-field"><label htmlFor="admin-worker">Worker</label><select id="admin-worker" value={draft.workerId} onChange={e=>field('workerId',e.target.value)}><option value="">All framers</option>{workers.map(worker=><option key={worker.id} value={worker.id}>{worker.name}</option>)}</select></div>
+          <div className="filter-field"><label htmlFor="admin-site">Job site</label><select id="admin-site" value={draft.siteId} onChange={e=>field('siteId',e.target.value)}><option value="">All job sites</option>{sites.map(site=><option key={site.id} value={site.id}>{site.name}</option>)}</select></div>
           <label>From date<input type="date" value={draft.from} max={draft.to||undefined} onChange={e=>field('from',e.target.value)} /></label>
           <label>To date<input type="date" value={draft.to} min={draft.from||undefined} onChange={e=>field('to',e.target.value)} /></label>
         </div><div className="filter-actions"><button>Apply filters</button><button type="button" className="secondary" onClick={()=>{setDraft({...emptyFilters});setResult(null);setApplied({...emptyFilters});}}>Reset filters</button></div>
