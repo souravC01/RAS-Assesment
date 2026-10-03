@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: ras-safety
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  datasource:
+    hikari:
+      maximum-pool-size: 5
+  servlet:
+    multipart:
+      max-file-size: 5000000B
+      max-request-size: 26000000B
+server:
+  port: ${PORT:8080}
+  servlet:
+    session:
+      timeout: 30m
+      cookie:
+        http-only: true
+        secure: true
+        same-site: lax
+        path: /
+demo:
+  seed-enabled: ${DEMO_SEED_ENABLED:false}
+  admin-password: ${DEMO_ADMIN_PASSWORD:}
+  framer-a-password: ${DEMO_FRAMER_A_PASSWORD:}
+  framer-b-password: ${DEMO_FRAMER_B_PASSWORD:}
