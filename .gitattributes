@@ -1,0 +1,6 @@
+* text=auto
+*.pdf binary
+*.png binary
+*.jpg binary
+*.cmd text eol=crlf
+mvnw text eol=lf

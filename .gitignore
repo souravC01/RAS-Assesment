@@ -6,5 +6,9 @@
 **/target/
 .worktrees/
 .idea/
+.agents/
+skills-lock.json
 *.log
 tmp/
+.neon
+node_modules/
