@@ -14,6 +14,7 @@ import javax.imageio.ImageIO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -86,4 +87,28 @@ public class SubmissionService {
         } catch(IOException ex) { throw new Failure(400,"The image could not be read.",Map.of("photos","Invalid image.")); }
     }
     private static void invalid(String field,String message) { throw new Failure(400,message,Map.of(field,message)); }
+    @Transactional(readOnly=true) public List<SubmissionRow> history(User actor) {
+        return submissions.findAllByWorkerIdOrderByWorkDateDescIdDesc(actor.getId()).stream().map(this::row).toList();
+    }
+    @Transactional(readOnly=true) public SubmissionDetail detail(User actor,Long id) {
+        var submission=(actor.getRole()==User.Role.ADMIN?submissions.findById(id):submissions.findByIdAndWorkerId(id,actor.getId()))
+            .orElseThrow(()->new Failure(404,"Submission not found."));
+        var row=row(submission);
+        return new SubmissionDetail(row.id(),row.worker(),row.site(),row.workDate(),row.submittedAt(),row.status(),
+            submission.getChecklist(),submission.getNotes(),submission.getPhotos().stream()
+                .map(p->new PhotoInfo(p.getId(),p.getContentType(),p.getByteSize())).toList());
+    }
+    @Transactional(readOnly=true) public AdminResult search(SubmissionFilter filter) {
+        if(filter.from()!=null && filter.to()!=null && filter.from().isAfter(filter.to())) invalid("from","Start date must be on or before end date.");
+        // ponytail: Loads the assessment dataset; paginate and aggregate in SQL if volume grows.
+        var items=submissions.search(filter.siteId(),filter.workerId(),filter.from(),filter.to()).stream().map(this::row).toList();
+        var counts=new LinkedHashMap<Long,SiteCount>();
+        for(var item:items) {
+            var prior=counts.get(item.site().id());
+            counts.put(item.site().id(),new SiteCount(item.site().id(),item.site().name(),prior==null?1:prior.count()+1));
+        }
+        return new AdminResult(items,List.copyOf(counts.values()));
+    }
+    private SubmissionRow row(Submission s) { return new SubmissionRow(s.getId(),new Reference(s.getWorker().getId(),s.getWorker().getName()),
+        new Reference(s.getSite().getId(),s.getSite().getName()),s.getWorkDate(),s.getSubmittedAt(),"Submitted"); }
 }

@@ -43,5 +43,11 @@
 - SubmissionCreateTest RED: two missing `/sites` route failures before implementation.
 - GREEN: SubmissionCreateTest 2/2 and AuthTest 2/2 passed, including required answers, issue notes, content validation, ownership, Vancouver date boundary, concurrent duplicate, second-upload failure, and a deferred PostgreSQL commit failure with object cleanup.
 - Database migrations enforce required values, allowed answers, unique worker/site/date, foreign keys, and photo sizes/keys.
+- Hosted submission 1 returned 201. Neon metadata confirmed the signed-in framer, Cedar Grove, October 3, ISSUE, and one 2,000-byte photo; the admin storage-probe route returned 404.
+
+## Authorized reads and filtering
+
+- SubmissionReadTest first failed at the missing history route. PostgreSQL then exposed an untyped null date-filter parameter; using the non-null date column as the omitted bound fixed it.
+- GREEN: all 5 related backend tests passed. Ownership history, concealed cross-user detail/photo IDs, admin access, five-minute photo expiry, no-store headers, individual/combined inclusive filters, unknown IDs, reversed dates, and empty counts were checked.
 
 Complete app behavior remains to be verified.

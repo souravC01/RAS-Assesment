@@ -25,6 +25,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/health", "/api/auth/csrf", "/api/auth/login").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/submissions").hasRole("FRAMER")
+                .requestMatchers(HttpMethod.GET, "/api/submissions").hasRole("FRAMER")
                 .anyRequest().authenticated())
             .headers(headers -> headers.cacheControl(cache -> cache.disable())
                 .addHeaderWriter((request, response) -> response.setHeader("Cache-Control", "no-store")))
