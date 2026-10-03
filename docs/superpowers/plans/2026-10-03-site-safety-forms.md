@@ -6,7 +6,7 @@
 
 **Architecture:** One repository contains a React frontend on a Render Static Site and one Spring Boot API on a Render Web Service. Verify Render's external `/api/*` rewrite behavior during the deployment gate; Spring owns sessions, authorization, validation, and all persistence. Neon PostgreSQL stores four domain entities, and private Neon Object Storage holds photos.
 
-**Repository:** https://github.com/souravC01/RAS-Assesment.git is the user-designated remote for all commits and pull requests. It was verified empty, private, and accessible with push permission. Feature branch `feat/site-safety` and PR #1 target `main`; the PR is attached to this chat and ready for review. The branch remains unmerged.
+**Repository:** https://github.com/souravC01/RAS-Assesment.git is the user-designated remote for all commits and pull requests. It was verified empty, private, and accessible with push permission. Feature branch `feat/site-safety` and PR #2 target `main`; the replacement PR is attached to this chat and ready for review. PR #1 was closed at the user's request. The branch remains unmerged.
 
 **Tech Stack:** React, JavaScript, Vite, React Router, CSS, Java 21, Spring Boot 4.1.1, Maven Wrapper, Spring Security, Spring Data JPA, Bean Validation, Flyway, PostgreSQL, AWS SDK for Java v2 S3 client/presigner. Tests use Spring Boot's test starter, Spring Security test support, PostgreSQL Testcontainers, and Node's built-in test runner for the small frontend request helper.
 
