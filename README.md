@@ -9,6 +9,29 @@ A mobile React app for framers to submit daily safety checks and photos, with an
 
 The repository is currently private. The candidate plans to make it public before submission; otherwise, grant the evaluator GitHub access. The app is a fictional assessment demo; Submitted means recorded for inspection, not certified safe.
 
+## Try the hosted demo
+
+Open [RAS Site Safety Forms](https://ras-assessment.onrender.com) and sign in with one of these accounts. No signup or local setup is required. Render's free backend sleeps when idle, so the first sign-in can take a few minutes while it wakes; wait for the request to finish, then retry if an error appears.
+
+### Demo login credentials
+
+| Role | Email | Password | Access |
+| --- | --- | --- | --- |
+| Admin | `admin@example.test` | `QXpZzoIrTXYZYT73xNK4hYTD` | All submissions, filters, site totals, details and photos |
+| Framer A | `framer.a@example.test` | `gwHyu6IqQsfC8zYQPIdz35Hj` | Create and view Alex Morgan's submissions |
+| Framer B | `framer.b@example.test` | `xMPk0ooor6AGRnmIt3xJ5M9j` | Create and view Taylor Reed's submissions; test separate ownership |
+
+These are shared accounts for the fictional assessment demo. Use fictional notes and non-sensitive test photos. The existing records and image fixtures are synthetic. Sites are Cedar Grove, Harbour View, and Maple Court.
+
+### Suggested testing walkthrough
+
+1. **Worker history:** Sign in as **Framer A**. On **My submissions**, open an existing record and select **View photo** to load its private photo.
+2. **Create a form:** Select **New submission**, choose a site and a date with no existing submission for that account, and answer all eight checks. Use **Pass**, **Issue**, or **Not applicable**; an **Issue** requires explanatory notes and can still be submitted. Add 1–5 JPEG/PNG photos (each at most 5,000,000 bytes) and submit. The saved detail is read-only. Future dates and duplicate account/site/date combinations are rejected.
+3. **Separate worker access:** Sign out and sign in as **Framer B**. Its **My submissions** list contains only its own records. Opening Framer A's saved detail URL as Framer B returns an unavailable record; the worker cannot retrieve another worker's photo links either.
+4. **Admin inspection:** Sign out and sign in as **Admin**. On **All submissions**, choose worker, job site, or date filters and select **Apply filters**. Check the matching **Submissions by site** totals, select **View** on a record, and inspect its answers and photo. **Reset filters** restores the full list.
+
+For a local installation, passwords come from your `DEMO_*_PASSWORD` environment values rather than this hosted-demo table. Seeding creates missing accounts/sites and never resets existing passwords.
+
 ## Stack and routing
 
 React 19 + JavaScript + Vite + React Router; Java 21 + Spring Boot 4.1.1 + Spring Security + JPA + Flyway; Neon PostgreSQL and private S3-compatible object storage.
@@ -58,16 +81,6 @@ Requirements: Java 21, Node 24, Docker, and a private Neon `images` bucket. Mave
    Open the displayed localhost URL. For macOS/Linux use `./mvnw`, `export` for environment variables, and your installed Java path.
 
 The requested Neon setup is represented by `neon.ts`: its `images` bucket is private. `neon login`, `neon link`, `neon config init`, and `neon deploy` configure a developer's branch. Neon's `AWS_*` variables map to the app's `S3_*` variables above. Credentials belong in ignored local files or provider secrets, never frontend `VITE_*` variables.
-
-## Demo accounts
-
-| Role | Email | Access |
-| --- | --- | --- |
-| Admin | `admin@example.test` | All submissions, filters, totals, details and photos |
-| Framer A | `framer.a@example.test` | Create and view own submissions |
-| Framer B | `framer.b@example.test` | Separate account for ownership checks |
-
-Live passwords are supplied separately in the private credential handoff. For local setup, use your environment values. Seeding creates missing accounts/sites and never resets existing passwords. Sites are fictional Cedar Grove, Harbour View, and Maple Court. The hosted demo includes synthetic image fixtures and fictional submissions from two framers across multiple dates/sites.
 
 ## Rules and assumptions
 
