@@ -8,7 +8,7 @@ export default function WorkerHistory() {
     api('/submissions',{signal:controller.signal}).then(setItems).catch(e=>{if(e.name!=='AbortError') setError(e.message);});
     return ()=>controller.abort();
   },[attempt]);
-  return <section><div className="page-heading"><div><p className="eyebrow">Daily records</p><h1>My submissions</h1></div>
+  return <section><div className="page-heading page-intro"><div><p className="eyebrow">Daily records</p><h1>My submissions</h1></div>
     <Link className="button" to="/submissions/new">New submission</Link></div>
     <p>View your submitted safety checks. Submitted forms cannot be edited.</p>
     {error?<div role="alert" className="error">{error} <button onClick={()=>setAttempt(a=>a+1)}>Try again</button></div>

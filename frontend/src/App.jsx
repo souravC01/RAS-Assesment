@@ -45,8 +45,8 @@ function Application() {
   }
   const home=user?.role==='ADMIN'?'/admin':'/submissions';
   function signedIn(actor) {++syncSequence.current;applyActor(actor,true);accountChannel.current?.postMessage({type:'login'});}
-  return <><header className="app-header"><div className="header-inner"><Link className="wordmark" to={user?home:'/login'}><img src="/ras-logo.png" alt="Ron Anderson & Sons Ltd." /><span>Site safety</span></Link>
-    {user&&<div className="account"><span>{user.name} · {user.role==='ADMIN'?'Admin':'Framer'}</span><button className="secondary" onClick={signOut}>Sign out</button></div>}</div></header><main>
+  return <><a className="skip-link" href="#main-content">Skip to content</a><header className="app-header"><div className="header-inner"><Link className="wordmark" to={user?home:'/login'}><img src="/ras-logo.png" alt="Ron Anderson & Sons Ltd." /><span>Site safety</span></Link>
+    {user&&<div className="account"><span>{user.name} · {user.role==='ADMIN'?'Admin':'Framer'}</span><button className="secondary" onClick={signOut}>Sign out</button></div>}</div></header><main id="main-content" tabIndex={-1}>
     {error && <p className="error" role="alert">{error}</p>}
     {loading ? <p role="status">Connecting to site safety…</p> : !user
       ? <Routes><Route path="/login" element={<Login onSignedIn={signedIn} />} /><Route path="*" element={<Navigate to="/login" replace />} /></Routes>
@@ -56,6 +56,6 @@ function Application() {
         <Route path="/submissions/:id" element={<DetailRoute user={user} />} />
         <Route path="/admin" element={user.role==='ADMIN'?<AdminDashboard />:<Navigate to="/submissions" replace />} />
         <Route path="*" element={<Navigate to={home} replace />} /></Routes>}
-  </main><footer>RAS · Daily site safety records</footer></>;
+  </main><footer><div className="footer-inner"><div><strong>Ron Anderson & Sons Ltd.</strong><span>Daily site safety records</span></div><a href="https://www.rasltd.ca/">Visit RAS website ↗</a></div></footer></>;
 }
 export default function App() {return <BrowserRouter><Application /></BrowserRouter>;}
