@@ -37,8 +37,8 @@ export default function SubmissionForm({user,onCreated,onSignedIn}) {
     finally {setPending(false);}
   }
   return <section className="form-page"><Link className="back-link" to="/submissions">← My submissions</Link>
-    <p className="eyebrow">Before work begins</p><h1>Daily safety form</h1>
-    <p>Report each check honestly. An issue can be submitted with explanatory notes.</p>
+    <div className="page-intro"><p className="eyebrow">Before work begins</p><h1>Daily safety form</h1>
+    <p>Report each check honestly. An issue can be submitted with explanatory notes.</p></div>
     {sitesLoading&&<p role="status">Loading job sites…</p>}
     {siteError&&<div className="error" role="alert"><p>{siteError}</p>{!expired&&<button type="button" disabled={sitesLoading} onClick={()=>setSiteAttempt(a=>a+1)}>Retry loading sites</button>}</div>}
     <form onSubmit={submit}>

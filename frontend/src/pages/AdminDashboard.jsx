@@ -17,7 +17,7 @@ export default function AdminDashboard() {
     return()=>controller.abort();
   },[applied]);
   function field(key,value){setDraft(current=>({...current,[key]:value}));}
-  return <section><p className="eyebrow">Admin overview</p><h1>All submissions</h1><p>Inspect daily safety records across your framers and job sites.</p>
+  return <section><div className="page-intro"><p className="eyebrow">Admin overview</p><h1>All submissions</h1><p>Inspect daily safety records across your framers and job sites.</p></div>
     <section className="panel filters"><h2>Find submissions</h2>
       <form onSubmit={e=>{e.preventDefault();setResult(null);setApplied({...draft});}}>
         <div className="filter-grid"><div className="filter-field"><label htmlFor="admin-worker">Worker</label><select id="admin-worker" value={draft.workerId} onChange={e=>field('workerId',e.target.value)}><option value="">All framers</option>{workers.map(worker=><option key={worker.id} value={worker.id}>{worker.name}</option>)}</select></div>
@@ -31,7 +31,7 @@ export default function AdminDashboard() {
       <section className="panel"><div className="page-heading"><h2>Submissions by site</h2><p className="muted">{result.items.length} {result.items.length===1?'submission matches':'submissions match'}</p></div>
         {result.countsBySite.length===0?<p>No site totals for the current filters.</p>:<ul className="site-counts">{result.countsBySite.map(site=><li data-testid="site-count" key={site.siteId}><span>{site.siteName}</span><strong>{site.count}</strong></li>)}</ul>}
       </section>
-      {result.items.length===0?<section className="panel empty"><h2>No submissions match these filters.</h2><p>Adjust the date range, worker, or job site.</p></section>:<section className="panel table-panel"><h2>Submission records</h2><div className="table-scroll"><table><thead><tr><th>Worker</th><th>Site</th><th>Date</th><th>Status</th><th aria-label="Details"></th></tr></thead>
+      {result.items.length===0?<section className="panel empty"><h2>No submissions match these filters.</h2><p>Adjust the date range, worker, or job site.</p></section>:<section className="panel table-panel"><h2>Submission records</h2><p className="table-hint muted">Scroll the table sideways to see all columns.</p><div className="table-scroll" role="region" aria-label="Submission records" tabIndex={0}><table><thead><tr><th>Worker</th><th>Site</th><th>Date</th><th>Status</th><th aria-label="Details"></th></tr></thead>
         <tbody>{result.items.map(item=><tr key={item.id}><td>{item.worker.name}</td><td>{item.site.name}</td><td><time dateTime={item.workDate}>{item.workDate}</time></td><td><span className="status">{item.status}</span></td><td><Link aria-label={`View submission ${item.id}`} to={`/submissions/${item.id}`}>View</Link></td></tr>)}</tbody></table></div>
       </section>}
     </>}
