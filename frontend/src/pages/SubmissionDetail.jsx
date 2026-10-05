@@ -15,7 +15,7 @@ export default function SubmissionDetail({id,user}) {
   useEffect(()=>{const controller=new AbortController();setDetail(null);setError('');api(`/submissions/${id}`,{signal:controller.signal})
     .then(setDetail).catch(e=>{if(e.name!=='AbortError')setError(e.message);});return()=>controller.abort();},[id]);
   return <section><Link className="back-link" to={user.role==='ADMIN'?'/admin':'/submissions'}>← {user.role==='ADMIN'?'All submissions':'My submissions'}</Link>
-    <p className="eyebrow">Read-only record</p><h1>Submission detail</h1>
+    <div className="page-intro"><p className="eyebrow">Read-only record</p><h1>Submission detail</h1></div>
     {error?<p className="error" role="alert">{error}</p>:!detail?<p role="status">Loading submission…</p>:<>
       <section className="panel"><div className="page-heading"><h2>{detail.site.name}</h2><span className="status">{detail.status}</span></div><dl className="metadata">
         <div><dt>Framer</dt><dd>{detail.worker.name}</dd></div><div><dt>Work date</dt><dd><time data-work-date dateTime={detail.workDate}>{detail.workDate}</time></dd></div>
