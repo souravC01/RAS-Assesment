@@ -5,7 +5,6 @@ A mobile React app for framers to submit daily safety checks and photos, with an
 - **Live app:** https://ras-assessment.onrender.com
 - **API health:** https://ras-assessment-api.onrender.com/api/health
 - **Repository:** https://github.com/souravC01/RAS-Assesment
-- **Pull request:** https://github.com/souravC01/RAS-Assesment/pull/2
 
 The repository is currently private. The candidate plans to make it public before submission; otherwise, grant the evaluator GitHub access. The app is a fictional assessment demo; Submitted means recorded for inspection, not certified safe.
 
@@ -47,7 +46,6 @@ Requirements: Java 21, Node 24, Docker, and a private Neon `images` bucket. Mave
    ```powershell
    git clone https://github.com/souravC01/RAS-Assesment.git
    cd RAS-Assesment
-   git checkout feat/site-safety
    docker compose up -d
    ```
 
@@ -97,9 +95,9 @@ The requested Neon setup is represented by `neon.ts`: its `images` bucket is pri
 
 ## Data model
 
-![Four-entity ERD](docs/erd.png)
+![Four-entity ERD](assets/erd.png)
 
-[Diagram source](docs/erd.mmd). Users and job sites each have many submissions; each submission has 1–5 photos, enforced by the service. Database constraints enforce foreign keys, allowed answers, byte sizes, unique photo keys, and the unique worker/site/date combination. All eight answers use the same PASS / ISSUE / NA constraint.
+[Diagram source](assets/erd.mmd). Users and job sites each have many submissions; each submission has 1–5 photos, enforced by the service. Database constraints enforce foreign keys, allowed answers, byte sizes, unique photo keys, and the unique worker/site/date combination. All eight answers use the same PASS / ISSUE / NA constraint.
 
 ## Verification
 
@@ -114,6 +112,10 @@ npm run build
 
 Docker must run for PostgreSQL Testcontainers. The real storage smoke is opt-in: set `STORAGE_SMOKE=true` and Neon's `AWS_ENDPOINT_URL_S3`, `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, then run `mvnw.cmd -Dtest=PhotoStorageTest test`. It creates a random `probe/` JPEG in `images`, checks unsigned denial and identical signed bytes, and deletes it in `finally`. A skipped smoke test is not evidence of working storage.
 
-[Verification evidence](docs/verification.md) covers real PostgreSQL, actual commit rollback, ownership/filters, hosted secure sessions/private photos, maximum-size transport, and real mobile Chrome checks. [Brand provenance](docs/brand.md) records the official logo/color source. [Handoff and interview notes](docs/handoff.md) explain the submission and key tradeoffs. The candidate should understand and be ready to modify the implementation.
+Recorded verification covered real PostgreSQL, actual commit rollback, ownership/filters, hosted secure sessions/private photos, maximum-size transport, and real mobile Chrome checks.
 
-The final controlled idle/wake check took about 2 minutes 47 seconds and required a fresh sign-in after the API restarted. [Execution decisions](docs/execution-decisions.md) records scope choices and the three tested review corrections. The confidential assessment PDF is kept locally and excluded from the published branch history.
+The final controlled idle/wake check took about 2 minutes 47 seconds and required a fresh sign-in after the API restarted. The confidential assessment PDF is kept locally and excluded from the published branch history.
+
+## Branding sources
+
+The logo and visual direction come from the official [Ron Anderson & Sons Ltd. website](https://www.rasltd.ca/). The bundled [logo](https://images.squarespace-cdn.com/content/v1/603d792c9b2ff375c0f46cb9/8db992b5-db8b-413d-9da1-005016d0b9e0/RAS+Logo_Updated+May+2023_RGB_green.png) and [Gainsborough Sans font](https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/603d792c9b2ff375c0f46cb9/assets/e3ab944a-c588-48c1-a494-7d9bd7d4b7fd/font.otf) were sourced from the supplied design reference for this fictional assessment demo.
