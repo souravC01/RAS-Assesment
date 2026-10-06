@@ -17,11 +17,11 @@ public class SubmissionDtos {
     public record CreateSubmission(@NotNull Long siteId,@NotNull LocalDate workDate,
         @NotNull @Valid Checklist checklist,@Size(max=4000) String notes) {}
     public record Reference(Long id,String name) {}
-    public record SubmissionRow(Long id,Reference worker,Reference site,LocalDate workDate,Instant submittedAt,String status) {}
+    public record SubmissionRow(Long id,Reference worker,Reference site,LocalDate workDate,Instant submittedAt,String status,boolean hasIssue) {}
     public record PhotoInfo(Long id,String contentType,Long byteSize) {}
     public record SubmissionDetail(Long id,Reference worker,Reference site,LocalDate workDate,Instant submittedAt,
         String status,Checklist checklist,String notes,List<PhotoInfo> photos) {}
     public record SubmissionFilter(Long siteId,Long workerId,LocalDate from,LocalDate to) {}
-    public record SiteCount(Long siteId,String siteName,long count) {}
+    public record SiteCount(Long siteId,String siteName,long count,long issueCount) {}
     public record AdminResult(List<SubmissionRow> items,List<SiteCount> countsBySite) {}
 }
