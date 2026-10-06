@@ -123,10 +123,11 @@ public class SubmissionService {
         var counts=new LinkedHashMap<Long,SiteCount>();
         for(var item:items) {
             var prior=counts.get(item.site().id());
-            counts.put(item.site().id(),new SiteCount(item.site().id(),item.site().name(),prior==null?1:prior.count()+1));
+            counts.put(item.site().id(),new SiteCount(item.site().id(),item.site().name(),prior==null?1:prior.count()+1,
+                (prior==null?0:prior.issueCount())+(item.hasIssue()?1:0)));
         }
         return new AdminResult(items,List.copyOf(counts.values()));
     }
     private SubmissionRow row(Submission s) { return new SubmissionRow(s.getId(),new Reference(s.getWorker().getId(),s.getWorker().getName()),
-        new Reference(s.getSite().getId(),s.getSite().getName()),s.getWorkDate(),s.getSubmittedAt(),"Submitted"); }
+        new Reference(s.getSite().getId(),s.getSite().getName()),s.getWorkDate(),s.getSubmittedAt(),"Submitted",s.getChecklist().hasIssue()); }
 }

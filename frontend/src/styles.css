@@ -111,8 +111,13 @@ dd { margin: 8px 0 0; font-weight: 600; }
 .filter-actions { display: flex; flex-wrap: wrap; gap: 12px; }
 .filter-field { display: grid; gap: 8px; }
 .site-counts { padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
-.site-counts li { display: flex; justify-content: space-between; align-items: center; gap: 16px; background: #e5eee8; padding: 16px; border-top: 3px solid var(--green); }
+.site-counts li { background: #e5eee8; padding: 16px; border-top: 3px solid var(--green); }
+.site-counts li > div { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.site-counts p { margin: 8px 0 0; font-size: .85rem; }
 .site-counts strong { font-family: var(--display); font-weight: 400; color: var(--green); font-size: 2.25rem; }
+.issue-indicator { display: inline-flex; align-items: center; gap: 8px; color: var(--green); font-size: .85rem; white-space: nowrap; }
+.issue-indicator.issue-label { color: #8c2923; }
+.issue-icon { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: 1px solid currentColor; font-size: 1.1rem; font-weight: 700; }
 .table-scroll { overflow-x: auto; }
 .table-hint { display: none; }
 table { border-collapse: collapse; width: 100%; min-width: 640px; text-align: left; }

@@ -51,6 +51,27 @@ class SubmissionReadTest {
         bPhoto=db.queryForObject("select id from photos where submission_id=?",Long.class,bId);
         clearInvocations(storage);
     }
+    @Test void countsSubmissionsWithIssuesOnceWithinActiveFilters() throws Exception {
+        db.update("update submissions set hard_hat='ISSUE',tools_cords='ISSUE',notes='Two reported issues' where id=?",aId);
+        db.update("update submissions set hazards_controlled='ISSUE',notes='Reported hazard' where work_date='2026-10-02'");
+        var admin=user("admin@example.test").roles("ADMIN");
+        mvc.perform(get("/api/admin/submissions").with(admin)).andExpect(status().isOk())
+            .andExpect(jsonPath("$.items[0].hasIssue").value(false))
+            .andExpect(jsonPath("$.items[1].hasIssue").value(true))
+            .andExpect(jsonPath("$.items[2].hasIssue").value(true))
+            .andExpect(jsonPath("$.items[3].hasIssue").value(false))
+            .andExpect(jsonPath("$.countsBySite[0].count").value(3))
+            .andExpect(jsonPath("$.countsBySite[0].issueCount").value(2))
+            .andExpect(jsonPath("$.countsBySite[1].issueCount").value(0));
+        mvc.perform(get("/api/admin/submissions").param("workerId",Long.toString(workerId)).with(admin))
+            .andExpect(jsonPath("$.countsBySite[0].count").value(1))
+            .andExpect(jsonPath("$.countsBySite[0].issueCount").value(1))
+            .andExpect(jsonPath("$.countsBySite[1].issueCount").value(0));
+        mvc.perform(get("/api/admin/submissions").param("siteId",Long.toString(siteId))
+            .param("from","2026-10-03").param("to","2026-10-03").with(admin))
+            .andExpect(jsonPath("$.countsBySite[0].count").value(2))
+            .andExpect(jsonPath("$.countsBySite[0].issueCount").value(1));
+    }
     @Test void enforcesOwnershipAndInclusiveFilters() throws Exception {
         var a=user("framer.a@example.test").roles("FRAMER");var admin=user("admin@example.test").roles("ADMIN");
         mvc.perform(get("/api/submissions").with(a)).andExpect(status().isOk())
